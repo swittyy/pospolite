@@ -362,7 +362,8 @@ body.cursor-ready .custom-cursor.is-hovering {
     text-shadow: 4px -4px 0 #f3f3ef55, 8px -8px 0 #f3f3ef20;
   }
   100% {
-    transform: rotate(720deg) translate(2px, 2px);
+    /* Two full turns, then settle 45° clockwise so ↘ points right. */
+    transform: rotate(675deg) translate(2px, 2px);
     text-shadow: 0 0 0 transparent;
   }
 }
