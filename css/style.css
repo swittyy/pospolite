@@ -650,3 +650,18 @@ body, .site-header, .category-card, .catalog-section, .contact-strip, .site-foot
     letter-spacing: -.08em;
   }
 }
+
+
+/* Typography refinement: slightly loosen tight tracking across the interface */
+.wordmark, .loader-wordmark { letter-spacing: -.055em; }
+h1 { letter-spacing: -.075em; }
+.hero-copy h1 { letter-spacing: -.065em; }
+.intro h2, .about-grid h2 { letter-spacing: -.055em; }
+.section-heading h2 { letter-spacing: -.075em; }
+.manifesto p { letter-spacing: -.045em; }
+@media (max-width: 760px) {
+  .hero-copy h1 { letter-spacing: -.06em; }
+}
+@media (max-width: 480px) {
+  .hero-copy h1 { letter-spacing: -.055em; }
+}

@@ -63,7 +63,7 @@
         themeTransitioning = false;
         if (caption) caption.textContent = "SWITCHING INTERFACE";
       }, 340);
-    }, 300);
+    }, 1500);
   };
   themeToggle?.addEventListener("click", () => {
     const isOpen = themeToggle.getAttribute("aria-expanded") === "true";
