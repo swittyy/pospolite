@@ -832,33 +832,3 @@ h1 { letter-spacing: -.075em; }
   .hero-footerline .hero-index-link,
   .hero-footerline .hero-index-link::before { transition: none; }
 }
-
-
-/* Category illustrations — each card gets its own recognizable hardware drawing */
-.component-visual.category-art {
-  isolation: isolate;
-  padding: 18px 12px;
-}
-.component-visual.category-art::before { z-index: -1; }
-.category-art svg {
-  display: block;
-  width: min(88%, 230px);
-  max-height: 175px;
-  overflow: visible;
-  color: var(--ink);
-  filter: drop-shadow(8px 9px 0 var(--shadow-soft));
-  transition: transform .55s cubic-bezier(.2,.7,.2,1), filter .35s ease;
-}
-.category-large .category-art svg { width: min(82%, 310px); max-height: 260px; }
-.category-card:hover .category-art svg {
-  transform: translateY(-5px) scale(1.045);
-  filter: drop-shadow(12px 13px 0 var(--shadow-soft));
-}
-@media (max-width: 480px) {
-  .component-visual.category-art { padding: 10px 4px; }
-  .category-art svg { max-height: 125px; }
-  .category-large .category-art svg { max-height: 190px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .category-art svg { transition: none; }
-}
