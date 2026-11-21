@@ -994,3 +994,51 @@ body { background: var(--paper); color: var(--ink); }
   .hero-actions { align-items: stretch; flex-direction: column; max-width: 230px; }
   .hero-primary, .hero-secondary { width: 100%; }
 }
+
+
+/* HeaderFix: social brand marks and compact Material-style theme switch */
+.header-socials { gap: 10px; }
+.header-socials a {
+  width: 36px; height: 36px; border-color: var(--line);
+  color: var(--ink); border-radius: 50%;
+}
+.header-socials a svg { width: 17px; height: 17px; display: block; }
+.header-socials a:hover { background: var(--ink); color: var(--paper); }
+.theme-control { display: flex; align-items: center; }
+.theme-toggle {
+  position: relative; width: 58px; min-width: 58px; height: 32px; min-height: 32px;
+  padding: 3px; border: 1px solid var(--control-border); border-radius: 999px;
+  background: var(--surface); color: var(--ink); justify-content: flex-start;
+  overflow: hidden; transition: background-color .3s ease, border-color .3s ease, box-shadow .25s ease;
+}
+.theme-toggle:hover { background: var(--surface); border-color: var(--ink); box-shadow: 0 0 0 3px var(--line); }
+.theme-toggle-icon {
+  position: relative; z-index: 1; width: 24px; height: 24px; flex: 0 0 24px;
+  display: grid; place-items: center; border-radius: 50%; background: var(--ink);
+  color: var(--paper); font: 13px/1 var(--sans); font-size: 0;
+  transition: transform .38s cubic-bezier(.2,.8,.2,1), background-color .3s ease, color .3s ease;
+}
+.theme-toggle-icon::before { content: "☼"; font-size: 15px; }
+html[data-theme="dark"] .theme-toggle-icon { transform: translateX(24px); }
+html[data-theme="dark"] .theme-toggle-icon::before { content: "☾"; }
+.theme-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.theme-reveal {
+  position: fixed; z-index: 1099; inset: 0; pointer-events: none;
+  clip-path: circle(150vmax at var(--origin-x) var(--origin-y));
+  transition: clip-path .82s cubic-bezier(.72,0,.18,1);
+  will-change: clip-path;
+}
+.theme-reveal.is-revealing { clip-path: circle(0 at var(--origin-x) var(--origin-y)); }
+@media (max-width: 760px) {
+  .header-socials { display: none; }
+  .theme-control { margin: 0 5px 0 auto; }
+  .theme-toggle { width: 58px; min-width: 58px; height: 32px; min-height: 32px; }
+}
+@media (max-width: 390px) {
+  .theme-toggle { width: 54px; min-width: 54px; }
+  html[data-theme="dark"] .theme-toggle-icon { transform: translateX(20px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle, .theme-toggle-icon, .theme-reveal { transition: none; }
+  .theme-reveal { display: none; }
+}

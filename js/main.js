@@ -6,13 +6,10 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  // Theme preference: explicit light/dark or follow the operating system.
+  // Theme switch: preserve system preference until the user changes it.
   const themeToggle = document.querySelector(".theme-toggle");
-  const themeOptions = document.querySelector(".theme-options");
-  const themeLoader = document.querySelector(".theme-loader");
   const themeMeta = document.querySelector('meta[name="theme-color"]');
   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
-  const themeNames = { light: "LIGHT", dark: "DARK", system: "SYSTEM" };
   const readThemeMode = () => {
     try {
       const saved = localStorage.getItem("pospolite-theme");
@@ -31,88 +28,59 @@
       themeMeta.setAttribute("content", pageColor || (resolved === "dark" ? "#050505" : "#f4f4f0"));
     }
     if (themeToggle) {
-      themeToggle.querySelector(".theme-toggle-label").textContent = themeNames[mode];
-      themeToggle.querySelector(".theme-toggle-icon").textContent = resolved === "dark" ? "◑" : "◐";
+      themeToggle.setAttribute("aria-pressed", String(resolved === "dark"));
+      themeToggle.setAttribute("aria-label", resolved === "dark" ? "Включена тёмная тема. Переключить на светлую" : "Включена светлая тема. Переключить на тёмную");
     }
-    themeOptions?.querySelectorAll("[data-theme-choice]").forEach((button) => {
-      button.setAttribute("aria-pressed", String(button.dataset.themeChoice === mode));
-    });
   };
   paintTheme(themeMode);
-  const closeThemeOptions = () => {
-    themeOptions?.setAttribute("hidden", "");
-    themeToggle?.setAttribute("aria-expanded", "false");
-  };
+
   const applyTheme = (nextMode, animate = true) => {
     if (!["light", "dark", "system"].includes(nextMode) || themeTransitioning) return;
     if (nextMode === themeMode && root.dataset.theme === resolvedTheme(nextMode)) return;
+
+    const currentPalette = getComputedStyle(root);
+    const previousPaper = currentPalette.getPropertyValue("--paper").trim() || currentPalette.backgroundColor;
+    const nextTheme = resolvedTheme(nextMode);
     themeMode = nextMode;
     try { localStorage.setItem("pospolite-theme", themeMode); } catch { /* Storage may be unavailable. */ }
-    closeThemeOptions();
-    if (!animate || reduceMotion || !themeLoader) {
+
+    if (!animate || reduceMotion) {
       paintTheme(themeMode);
       requestProgressUpdate();
       return;
     }
+
     themeTransitioning = true;
-    const caption = themeLoader.querySelector(".theme-loader-caption");
-    const track = themeLoader.querySelector(".loader-track");
-    const trackFill = themeLoader.querySelector(".loader-track span");
-    const currentPalette = getComputedStyle(root);
-    const previousColors = {
-      paper: currentPalette.getPropertyValue("--paper").trim() || currentPalette.backgroundColor,
-      ink: currentPalette.getPropertyValue("--ink").trim() || "#111111",
-      line: currentPalette.getPropertyValue("--line").trim() || "#d4d4ce"
-    };
+    const reveal = document.createElement("div");
+    reveal.className = "theme-reveal";
+    reveal.setAttribute("aria-hidden", "true");
+    const rect = themeToggle?.getBoundingClientRect();
+    const originX = rect ? rect.left + rect.width / 2 : window.innerWidth - 42;
+    const originY = rect ? rect.top + rect.height / 2 : 32;
+    reveal.style.setProperty("--origin-x", originX + "px");
+    reveal.style.setProperty("--origin-y", originY + "px");
+    reveal.style.backgroundColor = previousPaper;
+    document.body.appendChild(reveal);
 
-    // Freeze the loader in the outgoing palette while the page changes underneath it.
-    themeLoader.style.backgroundColor = previousColors.paper;
-    themeLoader.style.color = previousColors.ink;
-    if (track) track.style.backgroundColor = previousColors.line;
-    if (trackFill) trackFill.style.backgroundColor = previousColors.ink;
-    if (caption) caption.textContent = "RECONFIGURING INTERFACE";
-    themeLoader.classList.add("is-active");
-
+    paintTheme(themeMode);
+    requestProgressUpdate();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => reveal.classList.add("is-revealing"));
+    });
     window.setTimeout(() => {
-      paintTheme(themeMode);
-      requestProgressUpdate();
-
-      // Let the new theme settle completely before revealing the page.
-      window.setTimeout(() => {
-        themeLoader.classList.remove("is-active");
-        window.setTimeout(() => {
-          themeLoader.style.backgroundColor = "";
-          themeLoader.style.color = "";
-          if (track) track.style.backgroundColor = "";
-          if (trackFill) trackFill.style.backgroundColor = "";
-          themeTransitioning = false;
-          if (caption) caption.textContent = "SWITCHING INTERFACE";
-        }, 320);
-      }, 400);
-    }, 1500);
+      reveal.remove();
+      themeTransitioning = false;
+    }, 950);
   };
+
   themeToggle?.addEventListener("click", () => {
-    const isOpen = themeToggle.getAttribute("aria-expanded") === "true";
-    if (isOpen) closeThemeOptions();
-    else {
-      themeOptions?.removeAttribute("hidden");
-      themeToggle.setAttribute("aria-expanded", "true");
-    }
-  });
-  themeOptions?.querySelectorAll("[data-theme-choice]").forEach((button) => {
-    button.addEventListener("click", () => applyTheme(button.dataset.themeChoice));
-  });
-  document.addEventListener("pointerdown", (event) => {
-    if (!event.target.closest?.(".theme-control")) closeThemeOptions();
-  });
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeThemeOptions();
+    const current = resolvedTheme(themeMode);
+    applyTheme(current === "dark" ? "light" : "dark");
   });
   const onSystemThemeChange = () => {
-    if (themeMode === "system") applyTheme("system");
+    if (themeMode === "system") paintTheme("system");
   };
   systemTheme.addEventListener?.("change", onSystemThemeChange);
-
 
   // Loader stays for a deliberate minimum time, but never blocks a slow page forever.
   const loader = document.querySelector(".intro-loader");
