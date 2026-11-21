@@ -125,6 +125,35 @@
     }
   }
 
+  // Accessible mobile navigation: toggle, close on selection, Escape, or outside tap.
+  const siteHeader = document.querySelector(".site-header");
+  const menuToggle = document.querySelector(".menu-toggle");
+  const primaryNavigation = document.querySelector("#primary-navigation");
+  if (siteHeader && menuToggle && primaryNavigation) {
+    const closeMenu = () => {
+      siteHeader.classList.remove("menu-open");
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.setAttribute("aria-label", "Открыть меню");
+    };
+    menuToggle.addEventListener("click", () => {
+      const isOpen = siteHeader.classList.toggle("menu-open");
+      menuToggle.setAttribute("aria-expanded", String(isOpen));
+      menuToggle.setAttribute("aria-label", isOpen ? "Закрыть меню" : "Открыть меню");
+    });
+    primaryNavigation.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", closeMenu);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMenu();
+    });
+    document.addEventListener("pointerdown", (event) => {
+      if (!siteHeader.contains(event.target)) closeMenu();
+    });
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 760) closeMenu();
+    }, { passive: true });
+  }
+
   // Pause decorative infinite animations when the tab is not visible.
   document.addEventListener("visibilitychange", () => {
     body.classList.toggle("page-hidden", document.hidden);
