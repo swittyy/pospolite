@@ -227,23 +227,25 @@ body.motion-ready .reveal-target.is-visible {
 
 /* Interface details — loader, progress, cursor, magnetic motion */
 .scroll-progress {
+  --progress-color: #111;
   position: fixed;
   z-index: 1002;
   top: 0;
   left: 0;
   width: 100%;
-  height: 2px;
+  height: 4px;
   pointer-events: none;
-  background: transparent;
+  background: #77777735;
 }
+.scroll-progress.on-dark { --progress-color: #f3f3ef; }
 .scroll-progress-bar {
   display: block;
   width: 100%;
   height: 100%;
-  background: var(--ink);
-  transform: scaleX(0);
+  background: var(--progress-color);
+  transform: scaleX(var(--scroll-progress, 0));
   transform-origin: left center;
-  will-change: transform;
+  transition: background-color .2s ease;
 }
 .intro-loader {
   position: fixed;
@@ -261,12 +263,12 @@ body.motion-ready .reveal-target.is-visible {
 .loader-inner { width: min(300px, 72vw); }
 .loader-wordmark { display: block; font-size: clamp(30px, 7vw, 46px); font-weight: 800; letter-spacing: -.095em; }
 .loader-track { height: 1px; margin-top: 22px; background: #d1d1ca; overflow: hidden; }
-.loader-track span { display: block; height: 100%; width: 100%; background: var(--ink); transform: scaleX(0); transform-origin: left; animation: loader-fill 1s .12s cubic-bezier(.6,0,.3,1) forwards; }
+.loader-track span { display: block; height: 100%; width: 100%; background: var(--ink); transform: scaleX(0); transform-origin: left; animation: loader-fill 2.15s .12s cubic-bezier(.6,0,.3,1) forwards; }
 .loader-caption { display: flex; justify-content: space-between; margin-top: 9px; color: var(--muted); font: 8px var(--mono); letter-spacing: .08em; }
 @keyframes loader-fill { to { transform: scaleX(1); } }
 .wordmark-mark { display: inline-block; transform-origin: center; transition: transform .45s cubic-bezier(.2,.7,.2,1), color .3s ease; }
 .wordmark:hover .wordmark-mark { transform: rotate(180deg) scale(1.35); color: #888; }
-.magnetic { translate: var(--mag-x, 0px) var(--mag-y, 0px); will-change: translate; }
+.magnetic { translate: var(--mag-x, 0px) var(--mag-y, 0px); transition: translate .22s cubic-bezier(.2,.7,.2,1); }
 .custom-cursor, .custom-cursor-dot { position: fixed; z-index: 1003; top: 0; left: 0; pointer-events: none; opacity: 0; }
 .custom-cursor {
   width: 30px; height: 30px; border: 1px solid var(--ink); border-radius: 50%;
@@ -288,4 +290,13 @@ body.cursor-ready .custom-cursor.is-hovering {
   .loader-track span { animation: none; transform: scaleX(1); }
   .wordmark-mark { transition: none; }
   .magnetic { translate: none !important; }
+}
+
+
+/* Performance safeguards */
+.page-hidden .orbit-one,
+.page-hidden .orbit-two,
+.page-hidden .art-core { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress-bar { transition: none; }
 }
