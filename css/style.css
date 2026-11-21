@@ -581,3 +581,39 @@ body, .site-header, .category-card, .catalog-section, .contact-strip, .site-foot
   .theme-loader { transition: none; }
   .theme-loader.is-active .loader-track span { animation: none; transform: scaleX(1); }
 }
+
+
+/* Contrast corrections and simplified hero composition */
+:root[data-theme="light"] .manifesto,
+:root:not([data-theme="dark"]) .manifesto {
+  background: #111311;
+  color: #f1f1eb;
+}
+:root[data-theme="dark"] .manifesto {
+  background: #f3f3ef;
+  color: #111111;
+}
+:root[data-theme="dark"] .manifesto p span {
+  -webkit-text-stroke-color: #111111;
+}
+:root[data-theme="dark"] .manifesto-bottom,
+:root[data-theme="dark"] .manifesto-label {
+  color: #555650;
+}
+:root[data-theme="dark"] .announcement {
+  background: #f3f3ef;
+  color: #111111;
+}
+:root[data-theme="dark"] .announcement-index {
+  color: #555650;
+}
+.hero-art { display: none; }
+.hero-bottom { width: min(480px, 90%); }
+@media (max-width: 760px) {
+  .hero-art { display: none; }
+  .hero-bottom { width: 100%; }
+}
+@media (max-width: 480px) {
+  .hero-bottom { align-items: flex-start; }
+  .hero-description { max-width: 100%; }
+}
