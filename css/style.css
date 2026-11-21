@@ -265,3 +265,28 @@ h1 span {
 .product-price{font-family:"Courier New",monospace;font-size:14px;white-space:nowrap}
 .page-back{display:inline-block;margin-top:36px}
 @media(max-width:600px){.category-list li{grid-template-columns:34px minmax(0,1fr) auto}.item-list li{grid-template-columns:30px minmax(0,1fr) auto;gap:8px}.product-price{font-size:12px}}
+
+
+/* Small but noticeable Full version promo */
+.full-version-note {
+  width: fit-content;
+  max-width: 92%;
+  margin: 22px 4% 0;
+  padding: 10px 14px;
+  border: 1px solid #777;
+  border-left: 3px solid #171717;
+  color: #444;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.full-version-note span {
+  margin-right: 9px;
+  color: #171717;
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+@media (max-width: 600px) {
+  .full-version-note { margin-top: 18px; }
+}
