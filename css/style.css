@@ -617,3 +617,13 @@ body, .site-header, .category-card, .catalog-section, .contact-strip, .site-foot
   .hero-bottom { align-items: flex-start; }
   .hero-description { max-width: 100%; }
 }
+
+
+/* Restore the hero arrow and animated mark on desktop only */
+@media (min-width: 761px) {
+  .hero-art { display: block; }
+  .hero-bottom { width: min(480px, 90%); }
+}
+@media (max-width: 760px) {
+  .hero-art, .round-link { display: none !important; }
+}
