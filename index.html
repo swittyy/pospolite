@@ -163,18 +163,14 @@
       document.body.classList.add("motion-ready");
       targets.forEach((target) => target.classList.add("reveal-target"));
 
-      const observer = new IntersectionObserver((entries, currentObserver) => {
+      const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            currentObserver.unobserve(entry.target);
-          }
+          entry.target.classList.toggle("is-visible", entry.isIntersecting);
         });
       }, { threshold: 0.12, rootMargin: "0px 0px -36px 0px" });
 
       targets.forEach((target) => observer.observe(target));
     })();
   </script>
-
 </body>
 </html>
