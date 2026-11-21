@@ -262,3 +262,35 @@
     body.classList.toggle("page-hidden", document.hidden);
   });
 })();
+
+  // Hero index follows the section currently in view.
+  const indexLinks = [...document.querySelectorAll("[data-section-link]")];
+  const indexSections = indexLinks
+    .map((link) => document.getElementById(link.dataset.sectionLink))
+    .filter(Boolean);
+
+  if (indexLinks.length && indexSections.length && "IntersectionObserver" in window) {
+    const setActiveIndex = (activeId) => {
+      indexLinks.forEach((link) => {
+        const active = link.dataset.sectionLink === activeId;
+        link.classList.toggle("is-active", active);
+        if (active) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      });
+    };
+
+    const indexObserver = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+      if (visible[0]) setActiveIndex(visible[0].target.id);
+    }, {
+      rootMargin: "-24% 0px -52% 0px",
+      threshold: [0, 0.1, 0.25, 0.5, 0.75]
+    });
+
+    indexSections.forEach((section) => indexObserver.observe(section));
+    indexLinks.forEach((link) => {
+      link.addEventListener("click", () => setActiveIndex(link.dataset.sectionLink));
+    });
+  }
