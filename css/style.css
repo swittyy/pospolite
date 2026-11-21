@@ -266,27 +266,42 @@ h1 span {
 .page-back{display:inline-block;margin-top:36px}
 @media(max-width:600px){.category-list li{grid-template-columns:34px minmax(0,1fr) auto}.item-list li{grid-template-columns:30px minmax(0,1fr) auto;gap:8px}.product-price{font-size:12px}}
 
-
-/* Small but noticeable Full version promo */
+/* High-contrast Full version promo */
 .full-version-note {
-  width: fit-content;
-  max-width: 92%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  width: calc(100% - 8%);
   margin: 22px 4% 0;
-  padding: 10px 14px;
-  border: 1px solid #777;
-  border-left: 3px solid #171717;
-  color: #444;
-  font-size: 12px;
-  line-height: 1.5;
+  padding: 16px 20px;
+  background: #171717;
+  color: #f2f2f2;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 .full-version-note span {
-  margin-right: 9px;
-  color: #171717;
+  padding: 5px 8px;
+  border: 1px solid #777;
+  color: #fff;
   font-family: "Courier New", monospace;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: .06em;
+  letter-spacing: .08em;
+}
+.full-version-note strong {
+  color: #fff;
+  font-size: 24px;
+  letter-spacing: -.04em;
+  white-space: nowrap;
 }
 @media (max-width: 600px) {
-  .full-version-note { margin-top: 18px; }
+  .full-version-note {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px;
+    font-size: 14px;
+  }
+  .full-version-note strong { font-size: 22px; }
 }
