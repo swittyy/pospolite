@@ -200,3 +200,57 @@ h1 span {
     flex-wrap: wrap;
   }
 }
+
+
+.catalog-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 34px;
+  padding: 15px 18px;
+  border: 1px solid #222;
+  background: #171717;
+  color: #f2f2f2;
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  text-decoration: none;
+}
+.catalog-button span {
+  font-size: 18px;
+}
+.catalog-button:hover {
+  background: #333;
+}
+.back-link {
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  text-decoration: none;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+.components-page {
+  min-height: calc(100vh - 130px);
+  padding: 64px 4% 80px;
+}
+.components-page .catalog-heading {
+  align-items: flex-end;
+  border-bottom: 1px solid #bdbdbd;
+  padding-bottom: 24px;
+}
+.components-title {
+  font-size: clamp(42px, 8vw, 92px);
+  line-height: .95;
+}
+.components-title span {
+  color: #888;
+}
+.components-intro {
+  margin: 28px 0;
+  color: #555;
+}
+@media (max-width: 600px) {
+  .components-page { padding-top: 42px; }
+  .components-page .catalog-heading { align-items: flex-start; }
+  .catalog-button { gap: 14px; font-size: 10px; }
+}
