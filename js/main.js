@@ -132,7 +132,7 @@
 
   // Bidirectional section reveal. One observer handles every target.
   const revealTargets = document.querySelectorAll(
-    ".intro-content, .section-heading, .category-card, .manifesto-inner, .about-grid, .contact-strip"
+    ".intro-content, .section-heading, .category-card, .product-card, .manifesto-inner, .about-grid, .contact-strip"
   );
   if (reduceMotion || !("IntersectionObserver" in window)) {
     revealTargets.forEach((item) => item.classList.add("is-visible"));

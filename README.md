@@ -1,78 +1,90 @@
-
 # POSPOLITE
 
 **Открытый проект. Свободное программное обеспечение. Технологии для всех.**
 
-POSPOLITE — независимый проект, посвящённый продаже компьютерных комплектующих и, в перспективе, созданию и продаже готовых компьютеров.
+POSPOLITE — независимый проект о компьютерной технике и комплектующих. Сейчас проект включает статический сайт с предварительным каталогом; в дальнейшем планируется развитие полноценного интернет-магазина и платформы для подбора комплектующих.
 
-Проект разрабатывается с нуля с акцентом на минималистичный дизайн, удобство использования и открытость исходного кода.
+**Сайт:** https://pospoliteshop.ru  
+**GitHub:** https://github.com/swittyy/pospolite  
+**Discord:** https://discord.gg/5xtcNRp36  
+**Telegram:** https://t.me/pospoliteshop
 
 ## О проекте
 
-POSPOLITE начинается как небольшой интернет-магазин компьютерных комплектующих. Наша цель — создать удобную платформу, в которой пользователи смогут находить комплектующие, изучать их характеристики и в будущем заказывать индивидуальные сборки компьютеров.
-
-Мы верим, что программное обеспечение должно быть доступным, открытым и свободным для изучения и модификации.
-
-## Основные принципы
-
-- **Open Source** — исходный код проекта открыт для всех.
-- **Freedom** — свобода использования, изучения и изменения программного обеспечения.
-- **Transparency** — прозрачность разработки.
-- **Community** — развитие проекта вместе с сообществом.
-- **Simplicity** — минимализм и удобство во всём.
+POSPOLITE развивается открыто: исходный код доступен для изучения, а предложения сообщества помогают улучшать проект. Каталог постепенно наполняется реальными позициями. Если модель или характеристики пока неизвестны, они явно отмечаются как требующие уточнения.
 
 ## Технологии
 
-Предполагаемый технологический стек проекта:
+- **Frontend:** HTML, CSS, JavaScript — интерфейс сайта, адаптивная вёрстка, темы и интерактивность.
+- **Backend:** Rust — серверная часть. В репозитории добавлен начальный каркас API на Rust с HTTP-сервером и проверочным маршрутом.
+- **API:** REST-подход; серверный API будет постепенно расширяться.
+- **Frontend hosting:** GitHub Pages — публикация статического сайта.
+- **Backend hosting:** отдельный сервер или хостинг с поддержкой запуска Rust-приложений.
 
-- Frontend — HTML, CSS, JavaScript.
-- Backend — Rust.
-- API — REST API.
-- Хостинг frontend — GitHub Pages.
+GitHub Pages не запускает Rust-код. Поэтому frontend и backend публикуются отдельно. На текущем этапе сайт продолжает работать как статический frontend; Rust API пока не подключён к каталогу.
 
-Конкретные зависимости и дополнительные технологии будут указаны по мере развития проекта.
+## Backend на Rust
 
-## Разработка
+Исходники backend находятся в `src/main.rs`, конфигурация Cargo — в `Cargo.toml`.
 
-Проект находится на ранней стадии разработки.
+Текущий стартовый сервер:
+- запускает HTTP API;
+- предоставляет `GET /api/health` для проверки доступности;
+- возвращает JSON со статусом сервиса.
 
-Мы планируем постепенно реализовать:
+Запуск локально при установленном Rust toolchain:
 
-- Главную страницу.
-- Каталог компьютерных комплектующих.
-- Страницы товаров с характеристиками.
-- Поиск и фильтрацию.
-- Корзину.
-- Индивидуальные сборки компьютеров.
-- Административную панель.
+```bash
+cargo run
+```
 
-Некоторые из перечисленных возможностей пока являются планами, а не реализованными функциями.
+По умолчанию сервер слушает `127.0.0.1:3000`. Проверка:
+
+```bash
+curl http://127.0.0.1:3000/api/health
+```
+
+Это начальная основа, а не готовая коммерческая backend-система: база данных, авторизация, заказы, склад и интеграция с frontend ещё не реализованы.
+
+## Структура проекта
+
+```text
+.
+├── index.html
+├── css/
+│   └── style.css
+├── js/
+│   └── main.js
+├── src/
+│   └── main.rs
+├── Cargo.toml
+├── README.md
+├── README-STARTER.txt
+└── LICENSE
+```
+
+## План развития
+
+- [x] Статический сайт и адаптивный интерфейс.
+- [x] Светлая, тёмная и системная темы.
+- [x] Предварительный каталог товаров.
+- [x] Начальный Rust API с health-check.
+- [ ] Подключение базы данных и управление каталогом.
+- [ ] Подключение frontend к backend API.
+- [ ] Поиск и фильтрация товаров.
+- [ ] Корзина и оформление заказов.
+- [ ] Учёт остатков и административная панель.
+- [ ] Подбор и конфигуратор сборок ПК.
+
+Отмеченные как планируемые функции ещё не реализованы.
 
 ## Участие в проекте
 
-Мы приветствуем идеи, предложения, сообщения об ошибках и улучшения.
-
-Вы можете:
-- Создавать Issues.
-- Предлагать изменения через Pull Requests.
-- Сообщать об ошибках.
-- Помогать улучшать документацию.
-
-## Поддержка проекта
-
-POSPOLITE развивается благодаря энтузиазму и поддержке сообщества.
-
-Если вам нравится проект и вы хотите помочь его развитию, в будущем мы планируем добавить возможность добровольных пожертвований.
-
-Поддержка проекта всегда добровольна.
+Приветствуются идеи, предложения, сообщения об ошибках и Pull Requests. Перед отправкой изменений желательно описать, что именно меняется и зачем.
 
 ## Лицензия
 
-Проект распространяется под лицензией **MIT License**.
-
-Вы можете свободно использовать, копировать, изменять и распространять исходный код при соблюдении условий лицензии.
-
-Подробности находятся в файле [LICENSE](LICENSE).
+Проект распространяется под лицензией **MIT**. Подробности — в файле [LICENSE](LICENSE).
 
 ---
 
@@ -80,79 +92,35 @@ POSPOLITE развивается благодаря энтузиазму и по
 
 **Open project. Free software. Technology for everyone.**
 
-POSPOLITE is an independent project focused on computer hardware sales and, in the future, the development and sale of custom-built computers.
+POSPOLITE is an independent project focused on computer hardware and components. The current repository contains a static website with a preliminary product catalog. The long-term goal is to grow it into a full online store and a platform for choosing PC components.
 
-The project is being developed from scratch, with a focus on minimalist design, usability and open-source principles.
+**Website:** https://pospoliteshop.ru  
+**GitHub:** https://github.com/swittyy/pospolite  
+**Discord:** https://discord.gg/5xtcNRp36  
+**Telegram:** https://t.me/pospoliteshop
 
-## About
+## Technology Stack
 
-POSPOLITE starts as a small online store for computer components. Our goal is to build a convenient platform where users can discover hardware, explore product specifications and eventually order custom-built PCs.
+- **Frontend:** HTML, CSS and JavaScript.
+- **Backend:** Rust. An initial HTTP API scaffold is included.
+- **API:** REST-style endpoints, to be expanded.
+- **Frontend hosting:** GitHub Pages.
+- **Backend hosting:** a separate host capable of running Rust applications.
 
-We believe software should be accessible, open and free to study and modify.
+GitHub Pages serves static files and cannot execute Rust. The current frontend remains static and is not connected to the Rust API yet.
 
-## Core Principles
+## Rust Backend
 
-- **Open Source** — the project's source code is publicly available.
-- **Freedom** — the freedom to use, study and modify software.
-- **Transparency** — transparent development.
-- **Community** — growing the project together with the community.
-- **Simplicity** — minimalism and usability in everything.
+The backend source is in `src/main.rs`, with its Cargo configuration in `Cargo.toml`.
 
-## Technologies
+The initial server exposes `GET /api/health`, returning a JSON health status. Run it locally with `cargo run`; it listens on `127.0.0.1:3000` by default.
 
-The planned technology stack includes:
-
-- Frontend — HTML, CSS, JavaScript.
-- Backend — Rust.
-- API — REST API.
-- Frontend hosting — GitHub Pages.
-
-Specific dependencies and additional technologies will be documented as the project evolves.
-
-## Development
-
-The project is currently in its early development stage.
-
-Our roadmap includes:
-
-- Homepage.
-- Computer hardware catalog.
-- Product pages with specifications.
-- Search and filtering.
-- Shopping cart.
-- Custom PC builds.
-- Administration panel.
-
-Some of these features are planned and have not been implemented yet.
+This is only a foundation. Database storage, authentication, inventory, orders and frontend integration are not implemented yet.
 
 ## Contributing
 
-We welcome ideas, suggestions, bug reports and improvements.
-
-You can contribute by:
-- Creating Issues.
-- Submitting Pull Requests.
-- Reporting bugs.
-- Improving documentation.
-
-## Supporting the Project
-
-POSPOLITE is developed through enthusiasm and community support.
-
-If you like the project and want to help it grow, we plan to introduce voluntary donations in the future.
-
-All support is completely voluntary.
+Ideas, suggestions, bug reports and pull requests are welcome.
 
 ## License
 
-This project is licensed under the **MIT License**.
-
-You are free to use, copy, modify and distribute the source code, provided that you comply with the license terms.
-
-See the [LICENSE](LICENSE) file for details.
-
----
-
-<p align="center">
-  **POSPOLITE — Open by default.**
-</p>
+Licensed under the **MIT License**. See [LICENSE](LICENSE).
