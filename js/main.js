@@ -38,9 +38,6 @@
     if (!["light", "dark", "system"].includes(nextMode) || themeTransitioning) return;
     if (nextMode === themeMode && root.dataset.theme === resolvedTheme(nextMode)) return;
 
-    const currentPalette = getComputedStyle(root);
-    const previousPaper = currentPalette.getPropertyValue("--paper").trim() || currentPalette.backgroundColor;
-    const nextTheme = resolvedTheme(nextMode);
     themeMode = nextMode;
     try { localStorage.setItem("pospolite-theme", themeMode); } catch { /* Storage may be unavailable. */ }
 
@@ -59,10 +56,10 @@
     const originY = rect ? rect.top + rect.height / 2 : 32;
     reveal.style.setProperty("--origin-x", originX + "px");
     reveal.style.setProperty("--origin-y", originY + "px");
-    reveal.style.backgroundColor = previousPaper;
     document.body.appendChild(reveal);
 
     paintTheme(themeMode);
+    reveal.style.backgroundColor = getComputedStyle(root).getPropertyValue("--paper").trim() || getComputedStyle(root).backgroundColor;
     requestProgressUpdate();
     requestAnimationFrame(() => {
       requestAnimationFrame(() => reveal.classList.add("is-revealing"));
