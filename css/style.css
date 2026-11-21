@@ -254,3 +254,14 @@ h1 span {
   .components-page .catalog-heading { align-items: flex-start; }
   .catalog-button { gap: 14px; font-size: 10px; }
 }
+
+/* Category and item pages */
+.category-list li{grid-template-columns:60px 1fr auto}
+.category-list a.product-name{text-decoration:none}
+.category-list a.product-name:hover{text-decoration:underline}
+.item-list li{grid-template-columns:60px minmax(0,1fr) auto;padding:14px 0}
+.item-details{display:flex;flex-direction:column;gap:6px}
+.item-note{color:#777;font-size:12px;line-height:1.45}
+.product-price{font-family:"Courier New",monospace;font-size:14px;white-space:nowrap}
+.page-back{display:inline-block;margin-top:36px}
+@media(max-width:600px){.category-list li{grid-template-columns:34px minmax(0,1fr) auto}.item-list li{grid-template-columns:30px minmax(0,1fr) auto;gap:8px}.product-price{font-size:12px}}
