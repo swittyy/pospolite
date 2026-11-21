@@ -53,16 +53,37 @@
     }
     themeTransitioning = true;
     const caption = themeLoader.querySelector(".theme-loader-caption");
+    const track = themeLoader.querySelector(".loader-track");
+    const trackFill = themeLoader.querySelector(".loader-track span");
+    const previousTheme = root.dataset.theme;
+    const previousColors = previousTheme === "dark"
+      ? { paper: "#101110", ink: "#f1f1eb", line: "#353731" }
+      : { paper: "#f3f3ef", ink: "#111111", line: "#d4d4ce" };
+
+    // Freeze the loader in the outgoing palette while the page changes underneath it.
+    themeLoader.style.backgroundColor = previousColors.paper;
+    themeLoader.style.color = previousColors.ink;
+    if (track) track.style.backgroundColor = previousColors.line;
+    if (trackFill) trackFill.style.backgroundColor = previousColors.ink;
     if (caption) caption.textContent = "RECONFIGURING INTERFACE";
     themeLoader.classList.add("is-active");
+
     window.setTimeout(() => {
       paintTheme(themeMode);
       requestProgressUpdate();
-      themeLoader.classList.remove("is-active");
+
+      // Let the new theme settle completely before revealing the page.
       window.setTimeout(() => {
-        themeTransitioning = false;
-        if (caption) caption.textContent = "SWITCHING INTERFACE";
-      }, 340);
+        themeLoader.classList.remove("is-active");
+        window.setTimeout(() => {
+          themeLoader.style.backgroundColor = "";
+          themeLoader.style.color = "";
+          if (track) track.style.backgroundColor = "";
+          if (trackFill) trackFill.style.backgroundColor = "";
+          themeTransitioning = false;
+          if (caption) caption.textContent = "SWITCHING INTERFACE";
+        }, 320);
+      }, 400);
     }, 1500);
   };
   themeToggle?.addEventListener("click", () => {
