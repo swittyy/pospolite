@@ -342,10 +342,33 @@ body.cursor-ready .custom-cursor.is-hovering {
 .round-link:hover::before,
 .round-link:focus-visible::before { transform: scale(1); }
 .round-link:hover .round-link-arrow,
-.round-link:focus-visible .round-link-arrow { transform: rotate(-45deg) translate(2px, 2px); }
+.round-link:focus-visible .round-link-arrow {
+  animation: arrow-anime-spin .9s cubic-bezier(.16,1,.3,1) both;
+}
+
+@keyframes arrow-anime-spin {
+  0% {
+    transform: rotate(0deg) translate(0, 0);
+    text-shadow: 0 0 0 transparent;
+  }
+  18% {
+    text-shadow: -5px 5px 0 #11111155, -10px 10px 0 #11111125;
+  }
+  48% {
+    transform: rotate(360deg) translate(2px, 2px);
+    text-shadow: -4px 4px 0 #11111145, -8px 8px 0 #11111120;
+  }
+  72% {
+    text-shadow: 4px -4px 0 #f3f3ef55, 8px -8px 0 #f3f3ef20;
+  }
+  100% {
+    transform: rotate(720deg) translate(2px, 2px);
+    text-shadow: 0 0 0 transparent;
+  }
+}
 .round-link:active { transform: translateY(-1px) scale(.96); }
 .round-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .round-link, .round-link::before, .round-link-arrow { transition: none; }
+  .round-link, .round-link::before, .round-link-arrow { transition: none; animation: none !important; }
 }
