@@ -952,3 +952,45 @@ body { background: var(--paper); color: var(--ink); }
 @media (prefers-reduced-motion: reduce) {
   .hero-primary, .hero-secondary, .category-card, .category-info span, .header-socials a { transition: none; }
 }
+
+
+/* Final polish: keyboard focus, compact mobile navigation and safe layering */
+.hero-art { pointer-events: none; }
+.nav-link:focus-visible,
+.wordmark:focus-visible,
+.header-socials a:focus-visible,
+.footer-links a:focus-visible,
+.footer-bottom a:focus-visible,
+.text-link:focus-visible,
+.category-card:focus-visible,
+.hero-primary:focus-visible,
+.hero-secondary:focus-visible,
+.github-link:focus-visible,
+.theme-toggle:focus-visible,
+.theme-options button:focus-visible,
+.menu-toggle:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+.category-card { min-width: 0; }
+.category-info h3 { overflow-wrap: anywhere; }
+.product-card { min-width: 0; }
+.product-card h4, .product-card p { overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .site-header { position: relative; z-index: 40; }
+  .site-header .main-nav { z-index: 2; }
+  .site-header .main-nav .nav-link.active::after { content: none; }
+  .site-header .main-nav .nav-link.active { text-decoration: underline; text-underline-offset: 5px; }
+  .theme-control { z-index: 4; }
+  .menu-toggle { position: relative; z-index: 5; flex: 0 0 44px; }
+  .theme-options { z-index: 6; }
+  .hero { isolation: isolate; }
+}
+@media (max-width: 390px) {
+  .site-header { gap: 4px; }
+  .wordmark { font-size: 16px; }
+  .brand-symbol { width: 28px; font-size: 27px; }
+  .theme-toggle { width: 38px; min-width: 38px; padding: 0; justify-content: center; }
+  .hero-actions { align-items: stretch; flex-direction: column; max-width: 230px; }
+  .hero-primary, .hero-secondary { width: 100%; }
+}

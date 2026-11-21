@@ -26,7 +26,10 @@
     const resolved = resolvedTheme(mode);
     root.dataset.themeMode = mode;
     root.dataset.theme = resolved;
-    if (themeMeta) themeMeta.setAttribute("content", resolved === "dark" ? "#101110" : "#f3f3ef");
+    if (themeMeta) {
+      const pageColor = getComputedStyle(root).getPropertyValue("--paper").trim();
+      themeMeta.setAttribute("content", pageColor || (resolved === "dark" ? "#050505" : "#f4f4f0"));
+    }
     if (themeToggle) {
       themeToggle.querySelector(".theme-toggle-label").textContent = themeNames[mode];
       themeToggle.querySelector(".theme-toggle-icon").textContent = resolved === "dark" ? "◑" : "◐";
@@ -55,10 +58,12 @@
     const caption = themeLoader.querySelector(".theme-loader-caption");
     const track = themeLoader.querySelector(".loader-track");
     const trackFill = themeLoader.querySelector(".loader-track span");
-    const previousTheme = root.dataset.theme;
-    const previousColors = previousTheme === "dark"
-      ? { paper: "#101110", ink: "#f1f1eb", line: "#353731" }
-      : { paper: "#f3f3ef", ink: "#111111", line: "#d4d4ce" };
+    const currentPalette = getComputedStyle(root);
+    const previousColors = {
+      paper: currentPalette.getPropertyValue("--paper").trim() || currentPalette.backgroundColor,
+      ink: currentPalette.getPropertyValue("--ink").trim() || "#111111",
+      line: currentPalette.getPropertyValue("--line").trim() || "#d4d4ce"
+    };
 
     // Freeze the loader in the outgoing palette while the page changes underneath it.
     themeLoader.style.backgroundColor = previousColors.paper;
