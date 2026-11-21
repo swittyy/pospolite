@@ -342,7 +342,7 @@ body.cursor-ready .custom-cursor.is-hovering {
 .round-link:hover::before,
 .round-link:focus-visible::before { transform: scale(1); }
 .round-link:hover .round-link-arrow,
-.round-link:focus-visible .round-link-arrow { transform: translate(4px, 4px); }
+.round-link:focus-visible .round-link-arrow { transform: rotate(-45deg) translate(2px, 2px); }
 .round-link:active { transform: translateY(-1px) scale(.96); }
 .round-link:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
 
