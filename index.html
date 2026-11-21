@@ -9,7 +9,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+<script>
+    (() => {
+      try {
+        const saved = localStorage.getItem("pospolite-theme") || "system";
+        const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme = saved === "dark" || saved === "light" ? saved : (systemDark ? "dark" : "light");
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.themeMode = saved;
+      } catch {
+        document.documentElement.dataset.theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.themeMode = "system";
+      }
+    })();
+  </script>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="intro-loader" aria-hidden="true">
@@ -17,6 +31,13 @@
       <span class="loader-wordmark">POSPOLITE<span class="wordmark-mark">®</span></span>
       <div class="loader-track"><span></span></div>
       <div class="loader-caption"><span>INITIALIZING SYSTEM</span><span>001 / 001</span></div>
+    </div>
+  </div>
+  <div class="theme-loader" aria-hidden="true">
+    <div class="loader-inner">
+      <span class="loader-wordmark">POSPOLITE<span class="wordmark-mark">®</span></span>
+      <div class="loader-track"><span></span></div>
+      <div class="loader-caption"><span class="theme-loader-caption">SWITCHING INTERFACE</span><span>THEME / 001</span></div>
     </div>
   </div>
   <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar"></span></div>
@@ -37,6 +58,16 @@
       <a class="nav-link" href="#contacts">Контакты <span>04</span></a>
     </nav>
     <a class="header-cta magnetic" href="#catalog">Смотреть каталог <span>↗</span></a>
+    <div class="theme-control">
+      <button class="theme-toggle" type="button" aria-label="Выбрать тему оформления" aria-expanded="false" aria-controls="theme-options">
+        <span class="theme-toggle-icon" aria-hidden="true">◐</span><span class="theme-toggle-label">SYSTEM</span><span class="theme-toggle-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="theme-options" id="theme-options" role="group" aria-label="Тема оформления" hidden>
+        <button type="button" data-theme-choice="light">Светлая</button>
+        <button type="button" data-theme-choice="dark">Тёмная</button>
+        <button type="button" data-theme-choice="system">Как на устройстве</button>
+      </div>
+    </div>
     <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="primary-navigation" aria-expanded="false"><span></span><span></span></button>
   </header>
 

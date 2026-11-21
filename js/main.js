@@ -6,6 +6,88 @@
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
+  // Theme preference: explicit light/dark or follow the operating system.
+  const themeToggle = document.querySelector(".theme-toggle");
+  const themeOptions = document.querySelector(".theme-options");
+  const themeLoader = document.querySelector(".theme-loader");
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+  const themeNames = { light: "LIGHT", dark: "DARK", system: "SYSTEM" };
+  const readThemeMode = () => {
+    try {
+      const saved = localStorage.getItem("pospolite-theme");
+      return ["light", "dark", "system"].includes(saved) ? saved : "system";
+    } catch { return "system"; }
+  };
+  let themeMode = readThemeMode();
+  let themeTransitioning = false;
+  const resolvedTheme = (mode) => mode === "system" ? (systemTheme.matches ? "dark" : "light") : mode;
+  const paintTheme = (mode) => {
+    const resolved = resolvedTheme(mode);
+    root.dataset.themeMode = mode;
+    root.dataset.theme = resolved;
+    if (themeMeta) themeMeta.setAttribute("content", resolved === "dark" ? "#101110" : "#f3f3ef");
+    if (themeToggle) {
+      themeToggle.querySelector(".theme-toggle-label").textContent = themeNames[mode];
+      themeToggle.querySelector(".theme-toggle-icon").textContent = resolved === "dark" ? "◑" : "◐";
+    }
+    themeOptions?.querySelectorAll("[data-theme-choice]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.themeChoice === mode));
+    });
+  };
+  paintTheme(themeMode);
+  const closeThemeOptions = () => {
+    themeOptions?.setAttribute("hidden", "");
+    themeToggle?.setAttribute("aria-expanded", "false");
+  };
+  const applyTheme = (nextMode, animate = true) => {
+    if (!["light", "dark", "system"].includes(nextMode) || themeTransitioning) return;
+    if (nextMode === themeMode && root.dataset.theme === resolvedTheme(nextMode)) return;
+    themeMode = nextMode;
+    try { localStorage.setItem("pospolite-theme", themeMode); } catch { /* Storage may be unavailable. */ }
+    closeThemeOptions();
+    if (!animate || reduceMotion || !themeLoader) {
+      paintTheme(themeMode);
+      requestProgressUpdate();
+      return;
+    }
+    themeTransitioning = true;
+    const caption = themeLoader.querySelector(".theme-loader-caption");
+    if (caption) caption.textContent = "RECONFIGURING INTERFACE";
+    themeLoader.classList.add("is-active");
+    window.setTimeout(() => {
+      paintTheme(themeMode);
+      requestProgressUpdate();
+      themeLoader.classList.remove("is-active");
+      window.setTimeout(() => {
+        themeTransitioning = false;
+        if (caption) caption.textContent = "SWITCHING INTERFACE";
+      }, 340);
+    }, 300);
+  };
+  themeToggle?.addEventListener("click", () => {
+    const isOpen = themeToggle.getAttribute("aria-expanded") === "true";
+    if (isOpen) closeThemeOptions();
+    else {
+      themeOptions?.removeAttribute("hidden");
+      themeToggle.setAttribute("aria-expanded", "true");
+    }
+  });
+  themeOptions?.querySelectorAll("[data-theme-choice]").forEach((button) => {
+    button.addEventListener("click", () => applyTheme(button.dataset.themeChoice));
+  });
+  document.addEventListener("pointerdown", (event) => {
+    if (!event.target.closest?.(".theme-control")) closeThemeOptions();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeThemeOptions();
+  });
+  const onSystemThemeChange = () => {
+    if (themeMode === "system") applyTheme("system");
+  };
+  systemTheme.addEventListener?.("change", onSystemThemeChange);
+
+
   // Loader stays for a deliberate minimum time, but never blocks a slow page forever.
   const loader = document.querySelector(".intro-loader");
   const loaderStarted = performance.now();
