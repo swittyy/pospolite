@@ -163,3 +163,63 @@ h1 span { color: transparent; -webkit-text-stroke: 1.5px var(--ink); }
   height: 5px;
   background: #c7b76c;
 }
+
+
+/* Motion system — quiet, precise, and reduced-motion friendly */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translate3d(0, 22px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes orbit-turn {
+  from { transform: translate(-50%, -50%) rotate(-27deg); }
+  to { transform: translate(-50%, -50%) rotate(333deg); }
+}
+@keyframes orbit-turn-reverse {
+  from { transform: translate(-50%, -50%) rotate(48deg); }
+  to { transform: translate(-50%, -50%) rotate(-312deg); }
+}
+@keyframes core-float {
+  0%, 100% { transform: translate(-50%, -50%) rotate(-8deg) translateY(0); }
+  50% { transform: translate(-50%, -50%) rotate(-5deg) translateY(-9px); }
+}
+.hero-copy { animation: hero-rise .9s cubic-bezier(.2,.7,.2,1) both; }
+.hero-art { animation: hero-rise 1.1s .12s cubic-bezier(.2,.7,.2,1) both; }
+.orbit-one { animation: orbit-turn 48s linear infinite; }
+.orbit-two { animation: orbit-turn-reverse 62s linear infinite; }
+.art-core { animation: core-float 7s ease-in-out infinite; }
+.art-cross { animation: hero-rise 1s .5s both; }
+.round-link, .category-card, .text-link, .github-link, .footer-links a {
+  transition: color .25s ease, background-color .25s ease, border-color .25s ease, transform .35s cubic-bezier(.2,.7,.2,1);
+}
+.category-card:hover .component-visual > div {
+  transform: rotate(-5deg) scale(1.045);
+}
+.category-card .component-visual > div {
+  transition: transform .55s cubic-bezier(.2,.7,.2,1);
+}
+body.motion-ready .reveal-target {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);
+}
+body.motion-ready .reveal-target.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+.category-card.reveal-target:nth-child(2) { transition-delay: .06s; }
+.category-card.reveal-target:nth-child(3) { transition-delay: .12s; }
+.category-card.reveal-target:nth-child(4) { transition-delay: .18s; }
+.category-card.reveal-target:nth-child(5) { transition-delay: .24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  body.motion-ready .reveal-target {
+    opacity: 1;
+    transform: none;
+  }
+}
