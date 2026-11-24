@@ -89,12 +89,12 @@ document.addEventListener("pointerdown", (event: PointerEvent) => {
 document.addEventListener("keydown", (event: KeyboardEvent) => { if (event.key === "Escape") closeThemeOptions(); });
 systemTheme.addEventListener("change", () => { if (themeMode === "system") applyTheme("system", false); });
 
-// Loader: finish with a short cipher transition, then decode the hero headline.
+// Loader: cipher every visible text node, then reveal the whole interface.
 const loader = document.querySelector<HTMLElement>(".intro-loader");
 const loaderStarted = performance.now();
 const cipherGlyphs = [..."&₽#@+%Ж!?/<>"];
 const randomCipher = (value: string): string => [...value].map((char) =>
-  char === " " ? " " : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
+  /\s/.test(char) ? char : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
 ).join("");
 const animateCipher = (element: HTMLElement, target: string, duration: number): void => {
   const chars = [...target];
@@ -103,36 +103,88 @@ const animateCipher = (element: HTMLElement, target: string, duration: number): 
     const progress = Math.min(1, (now - started) / duration);
     const settled = Math.floor(progress * chars.length);
     element.textContent = chars.map((char, index) =>
-      char === " " || index < settled ? char : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
+      /\s/.test(char) || index < settled ? char : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
     ).join("");
     if (progress < 1) window.requestAnimationFrame(frame);
     else element.textContent = target;
   };
   window.requestAnimationFrame(frame);
 };
-const decryptLines = [...document.querySelectorAll<HTMLElement>("[data-decrypt]")];
-const decryptTargets = decryptLines.map((line) => line.textContent ?? "");
-const heroTitle = document.querySelector<HTMLElement>(".hero-title");
-if (!reduceMotion) decryptLines.forEach((line, index) => { line.textContent = randomCipher(decryptTargets[index]); });
-let loaderFinished = false;
-const decryptHero = (): void => {
-  if (reduceMotion || !decryptLines.length) return;
-  heroTitle?.classList.add("is-decoding");
-  decryptLines.forEach((line, index) => {
-    window.setTimeout(() => animateCipher(line, decryptTargets[index], 760), index * 120);
-  });
-  window.setTimeout(() => heroTitle?.classList.remove("is-decoding"), 1120);
+type CipherText = { node: Text; original: string };
+const cipheredNodes = new WeakSet<Text>();
+const textNodes: CipherText[] = [];
+let pageRevealed = false;
+const shouldSkipText = (node: Text): boolean => {
+  const parent = node.parentElement;
+  return !parent || !node.data.trim() ||
+    !!parent.closest("script, style, noscript, textarea, option, .intro-loader, .theme-loader, svg, [contenteditable='true']");
 };
+const revealText = ({ node, original }: CipherText, delay: number): void => {
+  const chars = [...original];
+  const decode = (): void => {
+    const started = performance.now();
+    const duration = Math.min(1050, Math.max(460, chars.length * 24));
+    const frame = (now: number): void => {
+      if (!node.isConnected) return;
+      const progress = Math.min(1, (now - started) / duration);
+      const settled = Math.floor(progress * chars.length);
+      node.data = chars.map((char, index) =>
+        /\s/.test(char) || index < settled ? char : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
+      ).join("");
+      if (progress < 1) window.requestAnimationFrame(frame);
+      else node.data = original;
+    };
+    window.requestAnimationFrame(frame);
+  };
+  if (delay > 0) window.setTimeout(decode, delay);
+  else decode();
+};
+const cipherTextIn = (scope: Node): void => {
+  if (reduceMotion) return;
+  const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
+  const candidates: Text[] = [];
+  if (scope instanceof Text) candidates.push(scope);
+  else {
+    let current = walker.nextNode();
+    while (current) {
+      if (current instanceof Text) candidates.push(current);
+      current = walker.nextNode();
+    }
+  }
+  candidates.forEach((node) => {
+    if (cipheredNodes.has(node) || shouldSkipText(node)) return;
+    const original = node.data;
+    cipheredNodes.add(node);
+    const entry = { node, original };
+    textNodes.push(entry);
+    node.data = randomCipher(original);
+    if (pageRevealed) revealText(entry, 0);
+  });
+};
+const revealWholePage = (): void => {
+  if (reduceMotion || pageRevealed) return;
+  pageRevealed = true;
+  textNodes.forEach((entry, index) => revealText(entry, Math.min(index * 12, 900)));
+};
+if (!reduceMotion) {
+  cipherTextIn(body);
+  // Text added later (catalog cards, fetched content, and other dynamic UI) gets the same treatment.
+  const textObserver = new MutationObserver((records) => records.forEach((record) => {
+    record.addedNodes.forEach((node) => cipherTextIn(node));
+  }));
+  textObserver.observe(body, { childList: true, subtree: true });
+}
+let loaderFinished = false;
 const finishLoader = (): void => {
-  if (!loader || loaderFinished) return;
+  if (loaderFinished) return;
   loaderFinished = true;
   const wait = Math.max(0, 2400 - (performance.now() - loaderStarted));
   window.setTimeout(() => {
-    const caption = loader.querySelector<HTMLElement>(".loader-caption span:first-child");
+    const caption = loader?.querySelector<HTMLElement>(".loader-caption span:first-child");
     const hideLoader = (): void => {
-      loader.classList.add("is-finished");
-      // The overlay fades for 650ms; leave another half-second before decoding.
-      window.setTimeout(decryptHero, 1150);
+      loader?.classList.add("is-finished");
+      // Let the overlay fade out before the complete page starts decoding.
+      window.setTimeout(revealWholePage, loader ? 1150 : 0);
     };
     if (caption && !reduceMotion) animateCipher(caption, randomCipher(caption.textContent ?? ""), 260);
     window.setTimeout(hideLoader, caption && !reduceMotion ? 280 : 0);
@@ -143,8 +195,8 @@ else if (loader && document.readyState === "complete") finishLoader();
 else if (loader) {
   window.addEventListener("load", finishLoader, { once: true });
   window.setTimeout(finishLoader, 4500);
-}
-
+} else if (document.readyState === "complete") finishLoader();
+else window.addEventListener("load", finishLoader, { once: true });
 // Reveal sections as they enter and leave the viewport.
 const revealTargets = document.querySelectorAll<HTMLElement>(".intro-content, .section-heading, .category-card, .product-card, .manifesto-inner, .about-grid, .contact-strip");
 if (reduceMotion || !("IntersectionObserver" in window)) revealTargets.forEach((item) => item.classList.add("is-visible"));
