@@ -4,7 +4,7 @@ import { categories } from "../data/catalog";
 const apiBase = import.meta.env.PUBLIC_API_URL ?? "";
 ---
 <SiteLayout title="Админ-панель — POSPOLITE" description="Управление каталогом POSPOLITE.">
-  <main class="admin-shell" data-api-base={apiBase}>
+  <main class="admin-shell" data-api-base={apiBase} data-initial-catalog={JSON.stringify({ categories })}>
     <header class="admin-top"><a class="wordmark" href={import.meta.env.BASE_URL}>POSPOLITE<span class="wordmark-mark">®</span></a><span>CONTROL PANEL / 001</span><a href={import.meta.env.BASE_URL}>НА САЙТ ↗</a></header>
     <section class="admin-intro"><p class="eyebrow">POSPOLITE / MANAGEMENT</p><h1>УПРАВЛЕНИЕ<span>.</span></h1><p>Каталог, цены и наличие — в одном месте.</p></section>
     <section class="admin-login" id="login-panel">
@@ -18,7 +18,7 @@ const apiBase = import.meta.env.PUBLIC_API_URL ?? "";
         <aside class="admin-categories"><div class="admin-subhead"><span>КАТЕГОРИИ</span><button id="add-category-button" type="button" aria-label="Добавить категорию">＋</button></div><div id="category-list"></div></aside>
         <section class="admin-editor"><div class="admin-subhead"><span id="selected-category-label">ВЫБЕРИ КАТЕГОРИЮ</span><button id="save-button" type="button">СОХРАНИТЬ ИЗМЕНЕНИЯ ↗</button></div><div id="category-editor"></div><div id="product-list"></div><button class="admin-add-product" id="add-product-button" type="button">＋ ДОБАВИТЬ ТОВАР</button><p class="admin-message" id="save-message" role="status"></p></section>
       </div>
-      <p class="admin-footnote">Изменения сохраняются на сервере API. Не публикуй токен и не передавай его посетителям сайта.</p>
+      <p class="admin-footnote" id="admin-mode-note">Изменения сохраняются на сервере API. Не публикуй токен и не передавай его посетителям сайта.</p>
     </section>
     <footer class="admin-footer"><span>POSPOLITE ADMIN / PRIVATE ACCESS</span><span>BUILD WITH CARE.</span></footer>
   </main>
@@ -38,8 +38,10 @@ const tokenInput = document.querySelector("#admin-token");
 const loginMessage = document.querySelector("#login-message");
 const saveMessage = document.querySelector("#save-message");
 let apiBase = shell.dataset.apiBase || "";
+const demoMode = !apiBase;
+const initialCatalog = JSON.parse(shell.dataset.initialCatalog || '{"categories":[]}');
 let token = "";
-let catalog = { categories: [] };
+let catalog = JSON.parse(JSON.stringify(initialCatalog));
 let selectedSlug = "";
 
 const api = async (path, options = {}) => {
@@ -132,11 +134,24 @@ document.querySelector("#add-category-button").addEventListener("click", () => {
   selectedSlug = slug; render();
 });
 document.querySelector("#save-button").addEventListener("click", async () => {
+  if (demoMode) {
+    saveMessage.textContent = "ДЕМО: ИЗМЕНЕНИЯ ОСТАНУТСЯ В ЭТОЙ ВКЛАДКЕ. API ДЛЯ ПОСТОЯННОГО СОХРАНЕНИЯ ПОКА НЕ ПОДКЛЮЧЁН.";
+    return;
+  }
   saveMessage.textContent = "СОХРАНЯЕМ…";
   try { await api("/api/admin/catalog", { method:"PUT", body:JSON.stringify(catalog) }); saveMessage.textContent = "ИЗМЕНЕНИЯ СОХРАНЕНЫ НА СЕРВЕРЕ."; render(); }
   catch (error) { saveMessage.textContent = error.message; }
 });
-document.querySelector("#refresh-button").addEventListener("click", loadCatalog);
+document.querySelector("#refresh-button").addEventListener("click", () => {
+  if (demoMode) {
+    catalog = JSON.parse(JSON.stringify(initialCatalog));
+    selectedSlug = catalog.categories[0]?.slug || "";
+    saveMessage.textContent = "ДЕМО-КАТАЛОГ ВОССТАНОВЛЕН К ИСХОДНОМУ СОСТОЯНИЮ.";
+    render();
+    return;
+  }
+  loadCatalog();
+});
 document.querySelector("#logout-button").addEventListener("click", () => {
   token = ""; catalog = { categories: [] }; workspace.hidden = true; loginPanel.hidden = false; tokenInput.value = "";
 });
@@ -145,6 +160,15 @@ async function loadCatalog() {
   selectedSlug = catalog.categories[0]?.slug || "";
   loginPanel.hidden = true; workspace.hidden = false; render();
 }
+if (demoMode) {
+  loginPanel.hidden = true;
+  workspace.hidden = false;
+  selectedSlug = catalog.categories[0]?.slug || "";
+  document.querySelector("#logout-button").hidden = true;
+  document.querySelector("#admin-mode-note").textContent = "DEMO MODE / БЕЗ ПАРОЛЯ. Можно проверять интерфейс, редактировать позиции и добавлять категории. Изменения живут только в этой вкладке и не сохраняются на сайте.";
+  render();
+}
+
 loginForm.addEventListener("submit", async event => {
   event.preventDefault(); loginMessage.textContent = "ПРОВЕРЯЕМ ДОСТУП…";
   apiBase = apiInput.value.trim().replace(/\/$/, "");
