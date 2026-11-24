@@ -5,7 +5,7 @@ const apiBase = import.meta.env.PUBLIC_API_URL ?? "";
 ---
 <SiteLayout title="Админ-панель — POSPOLITE" description="Управление каталогом POSPOLITE.">
   <main class="admin-shell" data-api-base={apiBase}>
-    <header class="admin-top"><a class="wordmark" href={import.meta.env.BASE_URL}>POSPOLITE<span class="wordmark-mark">®</span></a><span>CONTROL PANEL / 001</span><a href="/">НА САЙТ ↗</a></header>
+    <header class="admin-top"><a class="wordmark" href={import.meta.env.BASE_URL}>POSPOLITE<span class="wordmark-mark">®</span></a><span>CONTROL PANEL / 001</span><a href={import.meta.env.BASE_URL}>НА САЙТ ↗</a></header>
     <section class="admin-intro"><p class="eyebrow">POSPOLITE / MANAGEMENT</p><h1>УПРАВЛЕНИЕ<span>.</span></h1><p>Каталог, цены и наличие — в одном месте.</p></section>
     <section class="admin-login" id="login-panel">
       <div><span class="admin-label">01 / AUTHENTICATION</span><h2>ВХОД В СИСТЕМУ</h2><p>Введи секретный токен, заданный на сервере POSPOLITE API.</p></div>
