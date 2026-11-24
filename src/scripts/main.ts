@@ -122,7 +122,7 @@ if (!reduceMotion && loaderWordmarkText instanceof Text) {
     const progress = Math.min(1, (now - started) / 1050);
     const settled = Math.floor(progress * chars.length);
     loaderWordmarkText.data = chars.map((char, index) =>
-      /\\s/.test(char) || index < settled ? char : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
+      /\s/.test(char) || index < settled ? char : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
     ).join("");
     if (progress < 1) window.requestAnimationFrame(decodeWordmark);
     else loaderWordmarkText.data = target;
