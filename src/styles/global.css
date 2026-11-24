@@ -832,3 +832,10 @@ h1 { letter-spacing: -.075em; }
   .hero-footerline .hero-index-link,
   .hero-footerline .hero-index-link::before { transition: none; }
 }
+
+/* Cipher reveal: a restrained focus shift while the headline resolves. */
+.hero-title [data-decrypt] { display: inline-block; transition: filter .35s ease, opacity .35s ease; }
+.hero-title.is-decoding [data-decrypt] { filter: blur(.45px); }
+@media (prefers-reduced-motion: reduce) {
+  .hero-title [data-decrypt] { transition: none; filter: none; }
+}

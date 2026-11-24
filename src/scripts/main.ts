@@ -89,15 +89,60 @@ document.addEventListener("pointerdown", (event: PointerEvent) => {
 document.addEventListener("keydown", (event: KeyboardEvent) => { if (event.key === "Escape") closeThemeOptions(); });
 systemTheme.addEventListener("change", () => { if (themeMode === "system") applyTheme("system", false); });
 
-// Loader: deliberate minimum display time with a safety timeout.
+// Loader: finish with a short cipher transition, then decode the hero headline.
 const loader = document.querySelector<HTMLElement>(".intro-loader");
 const loaderStarted = performance.now();
-const finishLoader = (): void => window.setTimeout(() => loader?.classList.add("is-finished"), Math.max(0, 2400 - (performance.now() - loaderStarted)));
+const cipherGlyphs = [..."&₽#@+%Ж!?/<>"];
+const randomCipher = (value: string): string => [...value].map((char) =>
+  char === " " ? " " : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
+).join("");
+const animateCipher = (element: HTMLElement, target: string, duration: number): void => {
+  const chars = [...target];
+  const started = performance.now();
+  const frame = (now: number): void => {
+    const progress = Math.min(1, (now - started) / duration);
+    const settled = Math.floor(progress * chars.length);
+    element.textContent = chars.map((char, index) =>
+      char === " " || index < settled ? char : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
+    ).join("");
+    if (progress < 1) window.requestAnimationFrame(frame);
+    else element.textContent = target;
+  };
+  window.requestAnimationFrame(frame);
+};
+const decryptLines = [...document.querySelectorAll<HTMLElement>("[data-decrypt]")];
+const decryptTargets = decryptLines.map((line) => line.textContent ?? "");
+const heroTitle = document.querySelector<HTMLElement>(".hero-title");
+if (!reduceMotion) decryptLines.forEach((line, index) => { line.textContent = randomCipher(decryptTargets[index]); });
+let loaderFinished = false;
+const decryptHero = (): void => {
+  if (reduceMotion || !decryptLines.length) return;
+  heroTitle?.classList.add("is-decoding");
+  decryptLines.forEach((line, index) => {
+    window.setTimeout(() => animateCipher(line, decryptTargets[index], 760), index * 120);
+  });
+  window.setTimeout(() => heroTitle?.classList.remove("is-decoding"), 1120);
+};
+const finishLoader = (): void => {
+  if (!loader || loaderFinished) return;
+  loaderFinished = true;
+  const wait = Math.max(0, 2400 - (performance.now() - loaderStarted));
+  window.setTimeout(() => {
+    const caption = loader.querySelector<HTMLElement>(".loader-caption span:first-child");
+    const hideLoader = (): void => {
+      loader.classList.add("is-finished");
+      // The overlay fades for 650ms; leave another half-second before decoding.
+      window.setTimeout(decryptHero, 1150);
+    };
+    if (caption && !reduceMotion) animateCipher(caption, randomCipher(caption.textContent ?? ""), 260);
+    window.setTimeout(hideLoader, caption && !reduceMotion ? 280 : 0);
+  }, wait);
+};
 if (reduceMotion) loader?.classList.add("is-finished");
-else if (document.readyState === "complete") finishLoader();
-else {
+else if (loader && document.readyState === "complete") finishLoader();
+else if (loader) {
   window.addEventListener("load", finishLoader, { once: true });
-  window.setTimeout(() => loader?.classList.add("is-finished"), 4500);
+  window.setTimeout(finishLoader, 4500);
 }
 
 // Reveal sections as they enter and leave the viewport.
