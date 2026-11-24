@@ -14,8 +14,19 @@ const base = import.meta.env.BASE_URL;
   <div class="announcement"><span class="status-dot"></span><span>POSPOLITE — HARDWARE CATALOG</span><span class="announcement-index">RU / 002</span></div>
   <header class="site-header">
     <a class="wordmark" href={base} aria-label="POSPOLITE — главная">POSPOLITE<span class="wordmark-mark">®</span></a>
-    <nav class="main-nav" aria-label="Навигация"><a class="nav-link" href={`${base}#home`}>Главная <span>01</span></a><a class="nav-link active" href={`${base}#catalog`}>Каталог <span>02</span></a><a class="nav-link" href={`${base}#about`}>О проекте <span>03</span></a></nav>
+    <nav class="main-nav" id="primary-navigation" aria-label="Навигация"><a class="nav-link" href={`${base}#home`}>Главная <span>01</span></a><a class="nav-link active" href={`${base}#catalog`}>Каталог <span>02</span></a><a class="nav-link" href={`${base}#about`}>О проекте <span>03</span></a><a class="nav-link" href={`${base}#contacts`}>Контакты <span>04</span></a></nav>
     <a class="header-cta" href={`${base}#catalog`}>ВСЕ КАТЕГОРИИ <span>↗</span></a>
+    <div class="theme-control">
+      <button class="theme-toggle" type="button" aria-label="Выбрать тему оформления" aria-expanded="false" aria-controls="theme-options">
+        <span class="theme-toggle-icon" aria-hidden="true">◐</span><span class="theme-toggle-label">SYSTEM</span><span class="theme-toggle-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="theme-options" id="theme-options" role="group" aria-label="Тема оформления" hidden>
+        <button type="button" data-theme-choice="light">Светлая</button>
+        <button type="button" data-theme-choice="dark">Тёмная</button>
+        <button type="button" data-theme-choice="system">Как на устройстве</button>
+      </div>
+    </div>
+    <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="primary-navigation" aria-expanded="false"><span></span><span></span></button>
   </header>
   <main class="category-page" data-api-base={apiBase} data-category-slug={category.slug}>
     <div class="category-page-top"><span>POSPOLITE / COMPONENTS</span><span>CATEGORY / {category.index}</span></div>
@@ -56,20 +67,22 @@ const base = import.meta.env.BASE_URL;
 
 </style>
 <script>
-const page = document.querySelector(".category-page");
+interface ApiProduct { code: string; name: string; details: string; price: string; note: string; symbol: string; availability: string; }
+interface ApiCategory { slug: string; title: string; description: string; products: ApiProduct[]; }
+const page = document.querySelector<HTMLElement>(".category-page");
+const grid = document.querySelector<HTMLElement>("#catalog-products");
 const apiBase = page?.dataset.apiBase || "";
-if (apiBase) {
+if (page && grid && apiBase) {
   fetch(apiBase.replace(/\/$/, "") + "/api/catalog")
     .then(response => response.ok ? response.json() : Promise.reject(new Error("API unavailable")))
-    .then(data => {
+    .then((data: { categories: ApiCategory[] }) => {
       const category = data.categories.find(item => item.slug === page.dataset.categorySlug);
       if (!category) return;
-      document.querySelector("#category-title").textContent = category.title.toUpperCase() + ".";
-      document.querySelector("#category-description").textContent = category.description;
-      const grid = document.querySelector("#catalog-products");
+      document.querySelector("#category-title")!.textContent = category.title.toUpperCase() + ".";
+      document.querySelector("#category-description")!.textContent = category.description;
       grid.replaceChildren();
-      const visible = category.products.filter(product => product.availability !== "out_of_stock");
-      visible.forEach((product, index) => {
+      const visible = category.products.filter((product) => product.availability !== "out_of_stock");
+      visible.forEach((product: ApiProduct, index: number) => {
         const card = document.createElement("article"); card.className = "catalog-product";
         const meta = document.createElement("div"); meta.className = "catalog-product-meta";
         const code = document.createElement("span"); code.textContent = product.code;

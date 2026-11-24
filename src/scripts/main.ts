@@ -92,7 +92,9 @@ systemTheme.addEventListener("change", () => { if (themeMode === "system") apply
 // Loader: deliberate minimum display time with a safety timeout.
 const loader = document.querySelector<HTMLElement>(".intro-loader");
 const loaderStarted = performance.now();
-const finishLoader = (): void => window.setTimeout(() => loader?.classList.add("is-finished"), Math.max(0, 2400 - (performance.now() - loaderStarted)));
+const finishLoader = (): void => {
+  window.setTimeout(() => loader?.classList.add("is-finished"), Math.max(0, 2400 - (performance.now() - loaderStarted)));
+};
 if (reduceMotion) loader?.classList.add("is-finished");
 else if (document.readyState === "complete") finishLoader();
 else {

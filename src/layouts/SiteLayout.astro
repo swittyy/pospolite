@@ -2,8 +2,10 @@
 interface Props {
   title?: string;
   description?: string;
+  /** Ask search engines not to index the page (used for the admin panel). */
+  noindex?: boolean;
 }
-const { title = "POSPOLITE", description = "Компьютерные комплектующие и технологии без лишнего." } = Astro.props;
+const { title = "POSPOLITE", description = "Компьютерные комплектующие и технологии без лишнего.", noindex = false } = Astro.props;
 import "../styles/global.css";
 ---
 <!doctype html>
@@ -13,6 +15,7 @@ import "../styles/global.css";
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f3f3ef" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <title>{title}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

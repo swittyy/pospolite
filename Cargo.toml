@@ -6,7 +6,7 @@ description = "POSPOLITE catalog and admin API"
 
 [dependencies]
 axum = "0.8"
-tokio = { version = "1", features = ["macros", "rt-multi-thread", "fs", "sync", "net"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "fs", "sync", "net", "time"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tower-http = { version = "0.6", features = ["cors"] }

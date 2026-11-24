@@ -6,7 +6,7 @@ use axum::{
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
-use std::{env, net::SocketAddr, path::PathBuf, sync::Arc};
+use std::{collections::HashSet, env, net::SocketAddr, path::PathBuf, sync::Arc, time::Duration};
 use tokio::sync::Mutex;
 use tower_http::cors::{Any, CorsLayer};
 
@@ -43,9 +43,54 @@ struct AppState {
 #[derive(Deserialize)]
 struct LoginRequest { token: String }
 
+/// Compares two secrets without stopping at the first different byte,
+/// so the response time does not reveal how much of a guess was correct.
+fn tokens_match(given: &str, expected: &str) -> bool {
+    let (given, expected) = (given.as_bytes(), expected.as_bytes());
+    let mut diff = given.len() ^ expected.len();
+    for i in 0..given.len().max(expected.len()) {
+        let a = given.get(i).copied().unwrap_or(0);
+        let b = expected.get(i).copied().unwrap_or(0);
+        diff |= (a ^ b) as usize;
+    }
+    diff == 0
+}
+
 fn authorized(headers: &HeaderMap, state: &AppState) -> bool {
-    let expected = format!("Bearer {}", state.admin_token.as_str());
-    headers.get(header::AUTHORIZATION).and_then(|v| v.to_str().ok()) == Some(expected.as_str())
+    headers
+        .get(header::AUTHORIZATION)
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.strip_prefix("Bearer "))
+        .is_some_and(|given| tokens_match(given, state.admin_token.as_str()))
+}
+
+/// A slug is used in URLs (`/catalog/<slug>/`), so only a-z, 0-9 and `-` are allowed.
+fn is_valid_slug(slug: &str) -> bool {
+    !slug.is_empty()
+        && slug.len() <= 64
+        && slug.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+}
+
+fn catalog_is_valid(catalog: &Catalog) -> bool {
+    if catalog.categories.is_empty() {
+        return false;
+    }
+    let mut seen_slugs = HashSet::new();
+    catalog.categories.iter().all(|category| {
+        is_valid_slug(&category.slug)
+            && seen_slugs.insert(category.slug.as_str())
+            && !category.title.trim().is_empty()
+            && category.products.iter().all(|product| {
+                !product.name.trim().is_empty()
+                    && !product.price.trim().is_empty()
+                    && ["unknown", "in_stock", "out_of_stock"].contains(&product.availability.as_str())
+            })
+    })
+}
+
+/// Slows down password guessing: every failed attempt costs half a second.
+async fn failed_attempt_delay() {
+    tokio::time::sleep(Duration::from_millis(500)).await;
 }
 
 async fn health() -> Json<serde_json::Value> {
@@ -57,9 +102,10 @@ async fn get_catalog(State(state): State<AppState>) -> Json<Catalog> {
 }
 
 async fn login(State(state): State<AppState>, Json(body): Json<LoginRequest>) -> impl IntoResponse {
-    if body.token == *state.admin_token {
+    if tokens_match(&body.token, state.admin_token.as_str()) {
         (StatusCode::OK, Json(serde_json::json!({"authenticated": true})))
     } else {
+        failed_attempt_delay().await;
         (StatusCode::UNAUTHORIZED, Json(serde_json::json!({"error":"Неверный токен"})))
     }
 }
@@ -67,28 +113,26 @@ async fn login(State(state): State<AppState>, Json(body): Json<LoginRequest>) ->
 async fn save_catalog(
     State(state): State<AppState>,
     headers: HeaderMap,
-    Json(mut incoming): Json<Catalog>,
+    Json(incoming): Json<Catalog>,
 ) -> impl IntoResponse {
     if !authorized(&headers, &state) {
+        failed_attempt_delay().await;
         return (StatusCode::UNAUTHORIZED, Json(serde_json::json!({"error":"Требуется авторизация"})));
     }
-    if incoming.categories.is_empty()
-        || incoming.categories.iter().any(|c| c.slug.trim().is_empty() || c.title.trim().is_empty())
-        || incoming.categories.iter().flat_map(|c| c.products.iter()).any(|p| {
-            p.name.trim().is_empty() || p.price.trim().is_empty()
-                || !["unknown", "in_stock", "out_of_stock"].contains(&p.availability.as_str())
-        })
-    {
-        return (StatusCode::BAD_REQUEST, Json(serde_json::json!({"error":"Проверь обязательные поля и статус наличия"})));
+    if !catalog_is_valid(&incoming) {
+        return (StatusCode::BAD_REQUEST, Json(serde_json::json!({"error":"Проверь обязательные поля, статус наличия и slug (a-z, 0-9, дефис; без повторов)"})));
     }
 
     let serialized = match serde_json::to_vec_pretty(&incoming) {
         Ok(data) => data,
         Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({"error":"Не удалось сериализовать каталог"}))),
     };
+    // Hold the lock for the whole write: two simultaneous saves would otherwise
+    // write the same temporary file at once and could leave a mixed, broken catalog.
+    let mut catalog = state.catalog.lock().await;
     let temp_path = state.catalog_path.with_extension("json.tmp");
     if let Some(parent) = state.catalog_path.parent() {
-        if let Err(_) = tokio::fs::create_dir_all(parent).await {
+        if tokio::fs::create_dir_all(parent).await.is_err() {
             return (StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({"error":"Не удалось создать каталог данных"})));
         }
     }
@@ -97,8 +141,7 @@ async fn save_catalog(
     {
         return (StatusCode::INTERNAL_SERVER_ERROR, Json(serde_json::json!({"error":"Не удалось сохранить каталог на диск"})));
     }
-    let mut catalog = state.catalog.lock().await;
-    std::mem::swap(&mut *catalog, &mut incoming);
+    *catalog = incoming;
     (StatusCode::OK, Json(serde_json::json!({"saved":true})))
 }
 
@@ -112,9 +155,14 @@ async fn main() {
     let catalog_path = PathBuf::from(env::var("POSPOLITE_CATALOG_PATH").unwrap_or_else(|_| "data/catalog.json".into()));
     let initial: Catalog = serde_json::from_str(include_str!("../data/catalog.json"))
         .expect("embedded starter catalog is valid");
+    // Only a missing file falls back to the starter catalog. A damaged file must stop
+    // the server: silently replacing it would erase the real catalog on the next save.
     let catalog = match tokio::fs::read(&catalog_path).await {
-        Ok(bytes) => serde_json::from_slice(&bytes).unwrap_or(initial),
-        Err(_) => initial,
+        Ok(bytes) => serde_json::from_slice(&bytes).unwrap_or_else(|error| {
+            panic!("{} is not a valid catalog ({error}); fix or move this file", catalog_path.display())
+        }),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => initial,
+        Err(error) => panic!("cannot read {}: {error}", catalog_path.display()),
     };
     let state = AppState {
         catalog: Arc::new(Mutex::new(catalog)),
