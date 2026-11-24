@@ -112,6 +112,32 @@
   // Loader stays for a deliberate minimum time, but never blocks a slow page forever.
   const loader = document.querySelector(".intro-loader");
   const loaderStarted = performance.now();
+
+  // Decode the loader wordmark from cipher glyphs, without replacing its ® mark.
+  const cipherGlyphs = [..."&₽#@+%Ж!?/<>"];
+  const wordmarkText = loader?.querySelector(".loader-wordmark")?.firstChild;
+  if (!reduceMotion && wordmarkText instanceof Text) {
+    const target = wordmarkText.data;
+    const chars = [...target];
+    const randomCipher = () => chars.map((char) => /\\s/.test(char)
+      ? char
+      : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
+    ).join("");
+    wordmarkText.data = randomCipher();
+    const started = performance.now();
+    const decodeWordmark = (now) => {
+      const progress = Math.min(1, (now - started) / 1050);
+      const settled = Math.floor(progress * chars.length);
+      wordmarkText.data = chars.map((char, index) =>
+        /\\s/.test(char) || index < settled
+          ? char
+          : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
+      ).join("");
+      if (progress < 1) window.requestAnimationFrame(decodeWordmark);
+      else wordmarkText.data = target;
+    };
+    window.requestAnimationFrame(decodeWordmark);
+  }
   let pageLoaded = document.readyState === "complete";
   const finishLoader = () => {
     const elapsed = performance.now() - loaderStarted;
