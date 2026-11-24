@@ -1,0 +1,157 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+import { categories } from "../data/catalog";
+const apiBase = import.meta.env.PUBLIC_API_URL ?? "";
+---
+<SiteLayout title="Админ-панель — POSPOLITE" description="Управление каталогом POSPOLITE.">
+  <main class="admin-shell" data-api-base={apiBase}>
+    <header class="admin-top"><a class="wordmark" href="/">POSPOLITE<span class="wordmark-mark">®</span></a><span>CONTROL PANEL / 001</span><a href="/">НА САЙТ ↗</a></header>
+    <section class="admin-intro"><p class="eyebrow">POSPOLITE / MANAGEMENT</p><h1>УПРАВЛЕНИЕ<span>.</span></h1><p>Каталог, цены и наличие — в одном месте.</p></section>
+    <section class="admin-login" id="login-panel">
+      <div><span class="admin-label">01 / AUTHENTICATION</span><h2>ВХОД В СИСТЕМУ</h2><p>Введи секретный токен, заданный на сервере POSPOLITE API.</p></div>
+      <form id="login-form"><label for="api-url">API endpoint</label><input id="api-url" type="url" placeholder="https://api.example.com" value={apiBase} required /><label for="admin-token">Секретный токен</label><input id="admin-token" type="password" autocomplete="current-password" placeholder="Токен администратора" required /><button type="submit">ВОЙТИ <span>↗</span></button><p class="admin-message" id="login-message" role="status"></p></form>
+    </section>
+    <section class="admin-workspace" id="workspace" hidden>
+      <div class="admin-toolbar"><div><span class="admin-label">02 / OVERVIEW</span><h2>КАТАЛОГ</h2></div><div class="admin-actions"><span id="catalog-count"></span><button class="admin-secondary" id="refresh-button" type="button">ОБНОВИТЬ ↻</button><button class="admin-secondary" id="logout-button" type="button">ВЫЙТИ</button></div></div>
+      <div class="admin-stats"><article><span>КАТЕГОРИИ</span><strong id="stat-categories">—</strong></article><article><span>ПОЗИЦИИ</span><strong id="stat-products">—</strong></article><article><span>НАЛИЧИЕ НЕ УКАЗАНО</span><strong id="stat-unknown">—</strong></article></div>
+      <div class="admin-columns">
+        <aside class="admin-categories"><div class="admin-subhead"><span>КАТЕГОРИИ</span><button id="add-category-button" type="button" aria-label="Добавить категорию">＋</button></div><div id="category-list"></div></aside>
+        <section class="admin-editor"><div class="admin-subhead"><span id="selected-category-label">ВЫБЕРИ КАТЕГОРИЮ</span><button id="save-button" type="button">СОХРАНИТЬ ИЗМЕНЕНИЯ ↗</button></div><div id="category-editor"></div><div id="product-list"></div><button class="admin-add-product" id="add-product-button" type="button">＋ ДОБАВИТЬ ТОВАР</button><p class="admin-message" id="save-message" role="status"></p></section>
+      </div>
+      <p class="admin-footnote">Изменения сохраняются на сервере API. Не публикуй токен и не передавай его посетителям сайта.</p>
+    </section>
+    <footer class="admin-footer"><span>POSPOLITE ADMIN / PRIVATE ACCESS</span><span>BUILD WITH CARE.</span></footer>
+  </main>
+</SiteLayout>
+<style>
+.admin-shell{min-height:100vh;padding:0 5%;background:var(--paper);color:var(--ink)}.admin-top{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);font:9px var(--mono)}.admin-top>a:last-child{border-bottom:1px solid currentColor;padding-bottom:5px}.admin-intro{padding:76px 0 52px;border-bottom:1px solid var(--line)}.admin-intro .eyebrow,.admin-label{font:9px var(--mono);letter-spacing:.1em;color:var(--muted)}.admin-intro h1{margin:20px 0 12px;font-size:clamp(48px,9vw,104px);letter-spacing:-.08em;line-height:.95}.admin-intro h1 span{color:var(--muted)}.admin-intro>p:last-child{color:var(--muted);font-size:13px}.admin-login{display:grid;grid-template-columns:1fr minmax(280px,420px);gap:50px;padding:48px 0;border-bottom:1px solid var(--line)}.admin-login h2,.admin-toolbar h2{font-size:clamp(24px,4vw,42px);letter-spacing:-.06em;margin:18px 0 8px}.admin-login p{font-size:12px;color:var(--muted);line-height:1.7}.admin-login form{display:flex;flex-direction:column;gap:9px}.admin-login label{font:9px var(--mono);color:var(--muted);margin-top:8px}.admin-login input,.product-form input,.category-form input,.category-form textarea{width:100%;padding:13px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:12px var(--mono);border-radius:0}.admin-login button,.admin-subhead button,.admin-add-product{border:1px solid var(--ink);background:var(--ink);color:var(--paper);padding:14px;font:9px var(--mono);cursor:pointer}.admin-login button{margin-top:10px}.admin-workspace{padding:45px 0}.admin-toolbar{display:flex;justify-content:space-between;align-items:end;gap:20px}.admin-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.admin-actions>span{font:9px var(--mono);color:var(--muted);margin-right:8px}.admin-secondary{padding:10px 12px;background:transparent;color:var(--ink);border:1px solid var(--line);font:8px var(--mono);cursor:pointer}.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:28px 0}.admin-stats article{padding:18px;background:var(--surface);border:1px solid var(--line)}.admin-stats span{display:block;font:8px var(--mono);color:var(--muted)}.admin-stats strong{display:block;margin-top:10px;font:30px var(--mono)}.admin-columns{display:grid;grid-template-columns:230px 1fr;gap:24px}.admin-categories,.admin-editor{border:1px solid var(--line);background:var(--card);padding:18px;min-width:0}.admin-subhead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--line);font:9px var(--mono)}.admin-subhead button{padding:9px 12px}.category-choice{display:block;width:100%;padding:13px 10px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font:11px var(--mono);cursor:pointer}.category-choice[aria-current=true]{background:var(--surface)}.category-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 0;border-bottom:1px solid var(--line)}.category-form label,.product-form label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font:8px var(--mono)}.category-form label:nth-child(3){grid-column:1/-1}.category-form textarea{min-height:60px;resize:vertical}.product-row{padding:16px 0;border-bottom:1px solid var(--line)}.product-row-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;font:9px var(--mono);color:var(--muted)}.product-row-head button{border:0;background:transparent;color:var(--muted);cursor:pointer;font:9px var(--mono)}.product-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.product-form label:last-child{grid-column:1/-1}.product-form select{padding:12px;background:var(--surface);border:1px solid var(--line);color:var(--ink);font:10px var(--mono)}.admin-add-product{margin-top:16px;background:transparent;color:var(--ink)}.admin-footnote,.admin-message{font:9px/1.7 var(--mono);color:var(--muted)}.admin-footer{display:flex;justify-content:space-between;padding:22px 0;border-top:1px solid var(--line);font:8px var(--mono);color:var(--muted)}[hidden]{display:none!important}
+@media(max-width:760px){.admin-login{grid-template-columns:1fr;gap:18px}.admin-columns{grid-template-columns:1fr}.admin-categories{padding:12px}.admin-stats{gap:6px}.admin-stats article{padding:12px}.admin-stats strong{font-size:24px}.admin-toolbar{align-items:start;flex-direction:column}.admin-intro{padding:54px 0 38px}}
+@media(max-width:420px){.product-form,.category-form{grid-template-columns:1fr}.category-form label:nth-child(3),.product-form label:last-child{grid-column:auto}.admin-top{font-size:7px}.admin-stats span{font-size:7px}}
+</style>
+<script>
+const shell = document.querySelector(".admin-shell");
+const loginForm = document.querySelector("#login-form");
+const workspace = document.querySelector("#workspace");
+const loginPanel = document.querySelector("#login-panel");
+const apiInput = document.querySelector("#api-url");
+const tokenInput = document.querySelector("#admin-token");
+const loginMessage = document.querySelector("#login-message");
+const saveMessage = document.querySelector("#save-message");
+let apiBase = shell.dataset.apiBase || "";
+let token = "";
+let catalog = { categories: [] };
+let selectedSlug = "";
+
+const api = async (path, options = {}) => {
+  const response = await fetch(apiBase.replace(/\/$/, "") + path, {
+    ...options,
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(options.headers || {}) }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || `API error ${response.status}`);
+  return data;
+};
+const el = (tag, attrs = {}, text = "") => {
+  const node = document.createElement(tag);
+  Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+  if (text) node.textContent = text;
+  return node;
+};
+function render() {
+  const categories = catalog.categories;
+  const products = categories.reduce((sum, category) => sum + category.products.length, 0);
+  document.querySelector("#stat-categories").textContent = categories.length;
+  document.querySelector("#stat-products").textContent = products;
+  document.querySelector("#stat-unknown").textContent = categories.flatMap(c => c.products).filter(p => p.availability === "unknown").length;
+  document.querySelector("#catalog-count").textContent = `${products} PRODUCTS`;
+  const list = document.querySelector("#category-list");
+  list.replaceChildren();
+  categories.forEach(category => {
+    const button = el("button", { class: "category-choice", type: "button", "aria-current": String(category.slug === selectedSlug) }, category.title);
+    button.addEventListener("click", () => { selectedSlug = category.slug; render(); });
+    list.append(button);
+  });
+  const category = categories.find(c => c.slug === selectedSlug);
+  const editor = document.querySelector("#category-editor");
+  const productList = document.querySelector("#product-list");
+  editor.replaceChildren(); productList.replaceChildren();
+  document.querySelector("#selected-category-label").textContent = category ? category.index : "ВЫБЕРИ КАТЕГОРИЮ";
+  if (!category) return;
+  const categoryForm = el("div", { class: "category-form" });
+  const fields = [
+    ["Название", "title", category.title],
+    ["Индекс", "index", category.index],
+    ["Описание", "description", category.description]
+  ];
+  fields.forEach(([label, key, value]) => {
+    const wrap = el("label", {}, label);
+    const input = el(key === "description" ? "textarea" : "input", { value });
+    input.value = value;
+    input.addEventListener("input", () => { category[key] = input.value; });
+    wrap.append(input); categoryForm.append(wrap);
+  });
+  editor.append(categoryForm);
+  category.products.forEach((product, index) => {
+    const row = el("article", { class: "product-row" });
+    const head = el("div", { class: "product-row-head" });
+    head.append(el("span", {}, `PRODUCT / ${String(index + 1).padStart(2, "0")}`));
+    const remove = el("button", { type: "button" }, "УДАЛИТЬ ×");
+    remove.addEventListener("click", () => { category.products.splice(index, 1); render(); });
+    head.append(remove); row.append(head);
+    const form = el("div", { class: "product-form" });
+    const productFields = [
+      ["Название", "name"], ["Цена", "price"], ["Код", "code"],
+      ["Характеристики", "details"], ["Примечание", "note"], ["Символ", "symbol"]
+    ];
+    productFields.forEach(([label, key]) => {
+      const wrap = el("label", {}, label);
+      const input = el("input", { value: product[key] ?? "" });
+      input.value = product[key] ?? "";
+      input.addEventListener("input", () => { product[key] = input.value; });
+      wrap.append(input); form.append(wrap);
+    });
+    const statusWrap = el("label", {}, "Наличие");
+    const status = el("select");
+    [["unknown","Не указано"],["in_stock","В наличии"],["out_of_stock","Нет в наличии"]].forEach(([value,label]) => {
+      const option = el("option", { value }, label); option.selected = product.availability === value; status.append(option);
+    });
+    status.addEventListener("change", () => { product.availability = status.value; });
+    statusWrap.append(status); form.append(statusWrap); row.append(form); productList.append(row);
+  });
+}
+document.querySelector("#add-product-button").addEventListener("click", () => {
+  const category = catalog.categories.find(c => c.slug === selectedSlug);
+  if (!category) return;
+  category.products.push({ code:"NEW", name:"Новый товар", details:"", price:"0 ₽", note:"", symbol:"NEW", availability:"unknown" });
+  render();
+});
+document.querySelector("#add-category-button").addEventListener("click", () => {
+  const slug = prompt("Slug категории (латиницей, например storage):");
+  if (!slug || !/^[a-z0-9-]+$/.test(slug) || catalog.categories.some(c => c.slug === slug)) return;
+  catalog.categories.push({ slug, title:"Новая категория", index:` ${String(catalog.categories.length + 1).padStart(2,"0")} / NEW`, description:"ОПИСАНИЕ КАТЕГОРИИ.", products:[] });
+  selectedSlug = slug; render();
+});
+document.querySelector("#save-button").addEventListener("click", async () => {
+  saveMessage.textContent = "СОХРАНЯЕМ…";
+  try { await api("/api/admin/catalog", { method:"PUT", body:JSON.stringify(catalog) }); saveMessage.textContent = "ИЗМЕНЕНИЯ СОХРАНЕНЫ НА СЕРВЕРЕ."; render(); }
+  catch (error) { saveMessage.textContent = error.message; }
+});
+document.querySelector("#refresh-button").addEventListener("click", loadCatalog);
+document.querySelector("#logout-button").addEventListener("click", () => {
+  token = ""; catalog = { categories: [] }; workspace.hidden = true; loginPanel.hidden = false; tokenInput.value = "";
+});
+async function loadCatalog() {
+  catalog = await api("/api/catalog");
+  selectedSlug = catalog.categories[0]?.slug || "";
+  loginPanel.hidden = true; workspace.hidden = false; render();
+}
+loginForm.addEventListener("submit", async event => {
+  event.preventDefault(); loginMessage.textContent = "ПРОВЕРЯЕМ ДОСТУП…";
+  apiBase = apiInput.value.trim().replace(/\/$/, "");
+  token = tokenInput.value;
+  try {
+    await api("/api/admin/session", { method:"POST", body:JSON.stringify({ token }) });
+    await loadCatalog();
+  } catch (error) { token = ""; loginMessage.textContent = error.message; }
+});
+</script>
