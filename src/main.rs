@@ -105,9 +105,9 @@ async fn save_catalog(
 #[tokio::main]
 async fn main() {
     let admin_token = env::var("POSPOLITE_ADMIN_TOKEN")
-        .expect("Set POSPOLITE_ADMIN_TOKEN to a long random secret before starting the API");
-    if admin_token.len() < 32 {
-        panic!("POSPOLITE_ADMIN_TOKEN must contain at least 32 characters");
+        .expect("Set POSPOLITE_ADMIN_TOKEN before starting the API");
+    if admin_token.len() < 12 {
+        panic!("POSPOLITE_ADMIN_TOKEN must contain at least 12 characters");
     }
     let catalog_path = PathBuf::from(env::var("POSPOLITE_CATALOG_PATH").unwrap_or_else(|_| "data/catalog.json".into()));
     let initial: Catalog = serde_json::from_str(include_str!("../data/catalog.json"))
