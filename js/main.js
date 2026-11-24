@@ -119,7 +119,7 @@
   if (!reduceMotion && wordmarkText instanceof Text) {
     const target = wordmarkText.data;
     const chars = [...target];
-    const randomCipher = () => chars.map((char) => /\\s/.test(char)
+    const randomCipher = () => chars.map((char) => /\s/.test(char)
       ? char
       : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
     ).join("");
@@ -129,7 +129,7 @@
       const progress = Math.min(1, (now - started) / 1050);
       const settled = Math.floor(progress * chars.length);
       wordmarkText.data = chars.map((char, index) =>
-        /\\s/.test(char) || index < settled
+        /\s/.test(char) || index < settled
           ? char
           : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
       ).join("");
