@@ -1,5 +1,6 @@
 ---
 import SiteLayout from "../layouts/SiteLayout.astro";
+const base = import.meta.env.BASE_URL;
 ---
 <SiteLayout title="POSPOLITE" description="POSPOLITE — компьютерные комплектующие и технологии без лишнего.">
 
@@ -95,57 +96,57 @@ import SiteLayout from "../layouts/SiteLayout.astro";
         <p>БАЗА ДЛЯ ТВОЕЙ<br>СЛЕДУЮЩЕЙ СБОРКИ.</p>
       </div>
       <div class="category-grid">
-        <a class="category-card category-large" href="/catalog/gpu/">
+        <a class="category-card category-large" href={`${base}catalog/gpu/`}>
           <div class="category-number">01 / GPU</div>
           <div class="component-visual gpu-visual"><div class="gpu-body"><span>POS / GRAPHICS</span><i></i><b></b></div></div>
           <div class="category-info"><h3>Видеокарты</h3><span>↗</span></div>
         </a>
-        <a class="category-card" href="/catalog/cpu/">
+        <a class="category-card" href={`${base}catalog/cpu/`}>
           <div class="category-number">02 / CPU</div>
           <div class="component-visual cpu-visual"><div class="cpu-chip"><span>CORE</span><b>01</b></div></div>
           <div class="category-info"><h3>Процессоры</h3><span>↗</span></div>
         </a>
-        <a class="category-card" href="/catalog/ram/">
+        <a class="category-card" href={`${base}catalog/ram/`}>
           <div class="category-number">03 / RAM</div>
           <div class="component-visual ram-visual"><div class="ram-stick"><i></i><i></i><i></i><i></i><i></i></div></div>
           <div class="category-info"><h3>Оперативная память</h3><span>↗</span></div>
         </a>
-        <a class="category-card" href="/catalog/motherboards/">
+        <a class="category-card" href={`${base}catalog/motherboards/`}>
           <div class="category-number">04 / MB</div>
           <div class="component-visual board-visual"><div class="board"><i></i><b></b><span></span></div></div>
           <div class="category-info"><h3>Материнские платы</h3><span>↗</span></div>
         </a>
-        <a class="category-card" href="/catalog/psu/">
+        <a class="category-card" href={`${base}catalog/psu/`}>
           <div class="category-number">05 / POWER</div>
           <div class="component-visual storage-visual"><div class="ssd-drive"><span>POS / POWER</span><b>450W</b><i></i></div></div>
           <div class="category-info"><h3>Блоки питания</h3><span>↗</span></div>
         </a>
-        <a class="category-card" href="/catalog/cooling/">
+        <a class="category-card" href={`${base}catalog/cooling/`}>
           <div class="category-number">06 / COOLING</div>
           <div class="component-visual cpu-visual"><div class="cpu-chip"><span>COOL</span><b>FAN</b></div></div>
           <div class="category-info"><h3>Охлаждение</h3><span>↗</span></div>
         </a>
-        <a class="category-card" href="/catalog/keyboards/">
+        <a class="category-card" href={`${base}catalog/keyboards/`}>
           <div class="category-number">07 / KEYBOARD</div>
           <div class="component-visual ram-visual"><div class="ram-stick"><i></i><i></i><i></i><i></i><i></i></div></div>
           <div class="category-info"><h3>Клавиатуры</h3><span>↗</span></div>
         </a>
-        <a class="category-card" href="/catalog/mice/">
+        <a class="category-card" href={`${base}catalog/mice/`}>
           <div class="category-number">08 / MOUSE</div>
           <div class="component-visual cpu-visual"><div class="cpu-chip"><span>INPUT</span><b>M</b></div></div>
           <div class="category-info"><h3>Мыши</h3><span>↗</span></div>
         </a>
-        <a class="category-card" href="/catalog/audio/">
+        <a class="category-card" href={`${base}catalog/audio/`}>
           <div class="category-number">09 / AUDIO</div>
           <div class="component-visual board-visual"><div class="board"><i></i><b></b><span></span></div></div>
           <div class="category-info"><h3>Аудио</h3><span>↗</span></div>
         </a>
-        <a class="category-card" href="/catalog/monitors/">
+        <a class="category-card" href={`${base}catalog/monitors/`}>
           <div class="category-number">10 / DISPLAY</div>
           <div class="component-visual storage-visual"><div class="ssd-drive"><span>POS / DISPLAY</span><b>LCD</b><i></i></div></div>
           <div class="category-info"><h3>Мониторы</h3><span>↗</span></div>
         </a>
-        <a class="category-card" href="/catalog/cases/">
+        <a class="category-card" href={`${base}catalog/cases/`}>
           <div class="category-number">11 / CASE</div>
           <div class="component-visual gpu-visual"><div class="gpu-body"><span>POS / CASE</span><i></i><b></b></div></div>
           <div class="category-info"><h3>Корпуса</h3><span>↗</span></div>
@@ -179,7 +180,7 @@ import SiteLayout from "../layouts/SiteLayout.astro";
     <div class="footer-main">
       <a class="wordmark footer-wordmark" href="#home">POSPOLITE<span class="wordmark-mark">®</span></a>
       <p>OPEN BY DEFAULT.<br>BUILT WITH CURIOSITY.</p>
-      <div class="footer-links"><a href="#home">Главная</a><a href="#catalog">Каталог</a><a href="#about">О проекте</a><a href="https://github.com/swittyy/pospolite" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://discord.gg/5xtcNRp36" target="_blank" rel="noreferrer">Discord ↗</a><a href="https://t.me/pospoliteshop" target="_blank" rel="noreferrer">Telegram ↗</a></div>
+      <div class="footer-links"><a href="#home">Главная</a><a href="#catalog">Каталог</a><a href="#about">О проекте</a><a href="https://github.com/swittyy/pospolite" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://discord.gg/5xtcNRp36" target="_blank" rel="noreferrer">Discord ↗</a><a href="https://t.me/pospoliteshop" target="_blank" rel="noreferrer">Telegram ↗</a><a href={`${base}admin/`}>Админ-панель ↗</a></div>
     </div>
     <div class="footer-bottom"><span>© 2026 POSPOLITE. ВСЕ ПРАВА НА БРЕНД СОХРАНЕНЫ.</span><span>MADE FOR THE CURIOUS.</span><a href="#home">НАВЕРХ ↑</a></div>
   </footer>

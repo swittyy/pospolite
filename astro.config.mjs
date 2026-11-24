@@ -1,7 +1,8 @@
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://pospoliteshop.ru",
+  site: "https://swittyy.github.io",
+  base: "/pospolite",
   output: "static",
   trailingSlash: "always",
   build: {
