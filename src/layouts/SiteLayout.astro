@@ -1,0 +1,41 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title = "POSPOLITE", description = "Компьютерные комплектующие и технологии без лишнего." } = Astro.props;
+import "../styles/global.css";
+---
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f3f3ef" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script is:inline>
+      (() => {
+        try {
+          const saved = localStorage.getItem("pospolite-theme") || "system";
+          const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const theme = saved === "dark" || saved === "light" ? saved : (dark ? "dark" : "light");
+          document.documentElement.dataset.theme = theme;
+          document.documentElement.dataset.themeMode = saved;
+        } catch {
+          document.documentElement.dataset.theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          document.documentElement.dataset.themeMode = "system";
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+    <script>
+      import "../scripts/main";
+    </script>
+  </body>
+</html>

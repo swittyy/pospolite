@@ -1,0 +1,89 @@
+---
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import { categories } from "../../data/catalog";
+
+export function getStaticPaths() {
+  return categories.map((category) => ({ params: { type: category.slug }, props: { category } }));
+}
+interface Props { category: (typeof categories)[number]; }
+const { category } = Astro.props as Props;
+const apiBase = import.meta.env.PUBLIC_API_URL ?? "";
+const base = import.meta.env.BASE_URL;
+---
+<SiteLayout title={`${category.title} — POSPOLITE`} description={category.description}>
+  <div class="announcement"><span class="status-dot"></span><span>POSPOLITE — HARDWARE CATALOG</span><span class="announcement-index">RU / 002</span></div>
+  <header class="site-header">
+    <a class="wordmark" href={base} aria-label="POSPOLITE — главная">POSPOLITE<span class="wordmark-mark">®</span></a>
+    <nav class="main-nav" aria-label="Навигация"><a class="nav-link" href={`${base}#home`}>Главная <span>01</span></a><a class="nav-link active" href={`${base}#catalog`}>Каталог <span>02</span></a><a class="nav-link" href={`${base}#about`}>О проекте <span>03</span></a></nav>
+    <a class="header-cta" href={`${base}#catalog`}>ВСЕ КАТЕГОРИИ <span>↗</span></a>
+  </header>
+  <main class="category-page" data-api-base={apiBase} data-category-slug={category.slug}>
+    <div class="category-page-top"><span>POSPOLITE / COMPONENTS</span><span>CATEGORY / {category.index}</span></div>
+    <h1 id="category-title">{category.title.toUpperCase()}.</h1>
+    <p class="category-page-intro" id="category-description">{category.description}</p>
+    <div class="catalog-products" id="catalog-products" aria-live="polite">
+      {category.products.filter((product) => product.availability !== "out_of_stock").map((product, i) => (
+        <article class="catalog-product">
+          <div class="catalog-product-meta"><span>{product.code}</span><span>{String(i + 1).padStart(2, "0")}</span></div>
+          <div class="catalog-product-symbol">{product.symbol}</div>
+          <h2>{product.name}</h2><p>{product.details}</p>
+          <div class="catalog-product-bottom"><strong>{product.price}</strong><span>{product.availability === "in_stock" ? "В НАЛИЧИИ" : product.note || "Наличие уточняется"}</span></div>
+        </article>
+      ))}
+    </div>
+    <a class="category-back" href={`${base}#catalog`}>← НАЗАД К КАТЕГОРИЯМ</a>
+  </main>
+  <footer class="site-footer"><div class="footer-main"><a class="wordmark footer-wordmark" href={base}>POSPOLITE<span class="wordmark-mark">®</span></a><p>OPEN BY DEFAULT.<br />BUILT WITH CURIOSITY.</p><div class="footer-links"><a href={`${base}#catalog`}>Каталог</a><a href="https://github.com/swittyy/pospolite" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://discord.gg/5xtcNRp36" target="_blank" rel="noreferrer">Discord ↗</a><a href="https://t.me/pospoliteshop" target="_blank" rel="noreferrer">Telegram ↗</a><a href={`${base}admin/`}>Админ-панель ↗</a></div></div><div class="footer-bottom"><span>© 2026 POSPOLITE.</span><span>MADE FOR THE CURIOUS.</span><a href="#">НАВЕРХ ↑</a></div></footer>
+</SiteLayout>
+<style>
+.category-page{min-height:65vh;padding:clamp(54px,8vw,100px) 4.2%;background:var(--paper,#f3f3ef)}.category-page-top{display:flex;justify-content:space-between;gap:20px;color:var(--muted,#777);font:9px var(--mono,monospace);letter-spacing:.08em;border-bottom:1px solid var(--line,#d4d4ce);padding-bottom:18px}.category-page h1{margin:50px 0 12px;font-size:clamp(44px,8vw,100px);line-height:.95;letter-spacing:-.075em}.category-page-intro{color:var(--muted,#777);font:10px/1.8 var(--mono,monospace)}.catalog-products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:44px}.catalog-product{min-height:245px;padding:16px;display:flex;flex-direction:column;background:var(--card,#fff);border:1px solid var(--line,#d4d4ce)}.catalog-product-meta{display:flex;justify-content:space-between;color:var(--muted,#777);font:8px var(--mono,monospace)}.catalog-product-symbol{display:grid;place-items:center;width:76px;height:76px;margin:24px auto;border:1px solid var(--line,#d4d4ce);border-radius:50%;font:15px var(--mono,monospace)}.catalog-product h2{margin:auto 0 8px;font-size:14px;line-height:1.45}.catalog-product p{margin:0;min-height:32px;color:var(--muted,#777);font-size:10px;line-height:1.6}.catalog-product-bottom{display:flex;justify-content:space-between;align-items:end;gap:8px;margin-top:15px;padding-top:12px;border-top:1px solid var(--line,#d4d4ce)}.catalog-product-bottom strong{font-size:16px;white-space:nowrap}.catalog-product-bottom span{color:var(--muted,#777);font:7px/1.5 var(--mono,monospace);text-align:right}.catalog-empty{margin-top:40px;padding:28px;border:1px solid var(--line,#d4d4ce);color:var(--muted,#777);font:10px/1.8 var(--mono,monospace)}.category-back{display:inline-flex;gap:14px;margin-top:38px;padding-bottom:8px;border-bottom:1px solid currentColor;font:9px var(--mono,monospace)}
+@media(max-width:900px){.catalog-products{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:650px){.catalog-products{grid-template-columns:repeat(2,minmax(0,1fr))}.category-page{padding-left:5%;padding-right:5%}}@media(max-width:380px){.catalog-products{grid-template-columns:1fr}}
+
+/* Cards rendered by the client after the API response do not receive Astro's
+   scoped style attribute. Keep their presentation global so API and static
+   catalog cards look identical. */
+:global(.catalog-product) { min-height:245px; padding:16px; display:flex; flex-direction:column; background:var(--card,#fff); border:1px solid var(--line,#d4d4ce); }
+:global(.catalog-product-meta) { display:flex; justify-content:space-between; color:var(--muted,#777); font:8px var(--mono,monospace); }
+:global(.catalog-product-symbol) { display:grid; place-items:center; width:76px; height:76px; margin:24px auto; border:1px solid var(--line,#d4d4ce); border-radius:50%; font:15px var(--mono,monospace); }
+:global(.catalog-product h2) { margin:auto 0 8px; font-size:14px; line-height:1.45; }
+:global(.catalog-product p) { margin:0; min-height:32px; color:var(--muted,#777); font-size:10px; line-height:1.6; }
+:global(.catalog-product-bottom) { display:flex; justify-content:space-between; align-items:end; gap:8px; margin-top:15px; padding-top:12px; border-top:1px solid var(--line,#d4d4ce); }
+:global(.catalog-product-bottom strong) { font-size:16px; white-space:nowrap; }
+:global(.catalog-product-bottom span) { color:var(--muted,#777); font:7px/1.5 var(--mono,monospace); text-align:right; }
+:global(.catalog-empty) { margin-top:40px; padding:28px; border:1px solid var(--line,#d4d4ce); color:var(--muted,#777); font:10px/1.8 var(--mono,monospace); }
+@media(max-width:760px) { :global(.catalog-product) { min-height:235px; padding:12px; } }
+@media(max-width:380px) { :global(.catalog-product) { min-height:210px; } }
+
+</style>
+<script>
+const page = document.querySelector(".category-page");
+const apiBase = page?.dataset.apiBase || "";
+if (apiBase) {
+  fetch(apiBase.replace(/\/$/, "") + "/api/catalog")
+    .then(response => response.ok ? response.json() : Promise.reject(new Error("API unavailable")))
+    .then(data => {
+      const category = data.categories.find(item => item.slug === page.dataset.categorySlug);
+      if (!category) return;
+      document.querySelector("#category-title").textContent = category.title.toUpperCase() + ".";
+      document.querySelector("#category-description").textContent = category.description;
+      const grid = document.querySelector("#catalog-products");
+      grid.replaceChildren();
+      const visible = category.products.filter(product => product.availability !== "out_of_stock");
+      visible.forEach((product, index) => {
+        const card = document.createElement("article"); card.className = "catalog-product";
+        const meta = document.createElement("div"); meta.className = "catalog-product-meta";
+        const code = document.createElement("span"); code.textContent = product.code;
+        const number = document.createElement("span"); number.textContent = String(index + 1).padStart(2, "0");
+        meta.append(code, number);
+        const symbol = document.createElement("div"); symbol.className = "catalog-product-symbol"; symbol.textContent = product.symbol;
+        const title = document.createElement("h2"); title.textContent = product.name;
+        const details = document.createElement("p"); details.textContent = product.details;
+        const bottom = document.createElement("div"); bottom.className = "catalog-product-bottom";
+        const price = document.createElement("strong"); price.textContent = product.price;
+        const note = document.createElement("span"); note.textContent = product.availability === "in_stock" ? "В НАЛИЧИИ" : product.note || "Наличие уточняется";
+        bottom.append(price, note); card.append(meta, symbol, title, details, bottom); grid.append(card);
+      });
+      if (!visible.length) { const empty = document.createElement("div"); empty.className = "catalog-empty"; empty.textContent = "ПОКА НЕТ ДОСТУПНЫХ ПОЗИЦИЙ В ЭТОЙ КАТЕГОРИИ."; grid.append(empty); }
+    }).catch(() => { /* Static catalog remains available when the API is offline. */ });
+}
+</script>

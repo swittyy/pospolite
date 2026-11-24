@@ -1,0 +1,187 @@
+---
+import SiteLayout from "../layouts/SiteLayout.astro";
+const base = import.meta.env.BASE_URL;
+---
+<SiteLayout title="POSPOLITE" description="POSPOLITE — компьютерные комплектующие и технологии без лишнего.">
+
+  <div class="intro-loader" aria-hidden="true">
+    <div class="loader-inner">
+      <span class="loader-wordmark">POSPOLITE<span class="wordmark-mark">®</span></span>
+      <div class="loader-track"><span></span></div>
+      <div class="loader-caption"><span>INITIALIZING SYSTEM</span><span>001 / 001</span></div>
+    </div>
+  </div>
+  <div class="theme-loader" aria-hidden="true">
+    <div class="loader-inner">
+      <span class="loader-wordmark">POSPOLITE<span class="wordmark-mark">®</span></span>
+      <div class="loader-track"><span></span></div>
+      <div class="loader-caption"><span class="theme-loader-caption">SWITCHING INTERFACE</span><span>THEME / 001</span></div>
+    </div>
+  </div>
+  <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar"></span></div>
+  <div class="custom-cursor" aria-hidden="true"></div>
+  <div class="custom-cursor-dot" aria-hidden="true"></div>
+  <div class="announcement">
+    <span class="status-dot"></span>
+    <span>POSPOLITE — независимый проект о технологиях</span>
+    <span class="announcement-index">RU / 001</span>
+  </div>
+
+  <header class="site-header">
+    <a class="wordmark" href="#" aria-label="POSPOLITE — главная">POSPOLITE<span class="wordmark-mark">®</span></a>
+    <nav class="main-nav" id="primary-navigation" aria-label="Главная навигация">
+      <a class="nav-link active" href="#home">Главная <span>01</span></a>
+      <a class="nav-link" href="#catalog">Каталог <span>02</span></a>
+      <a class="nav-link" href="#about">О проекте <span>03</span></a>
+      <a class="nav-link" href="#contacts">Контакты <span>04</span></a>
+    </nav>
+    <div class="theme-control">
+      <button class="theme-toggle" type="button" aria-label="Выбрать тему оформления" aria-expanded="false" aria-controls="theme-options">
+        <span class="theme-toggle-icon" aria-hidden="true">◐</span><span class="theme-toggle-label">SYSTEM</span><span class="theme-toggle-chevron" aria-hidden="true">⌄</span>
+      </button>
+      <div class="theme-options" id="theme-options" role="group" aria-label="Тема оформления" hidden>
+        <button type="button" data-theme-choice="light">Светлая</button>
+        <button type="button" data-theme-choice="dark">Тёмная</button>
+        <button type="button" data-theme-choice="system">Как на устройстве</button>
+      </div>
+    </div>
+    <button class="menu-toggle" type="button" aria-label="Открыть меню" aria-controls="primary-navigation" aria-expanded="false"><span></span><span></span></button>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-topline">
+        <span>PC COMPONENTS / CUSTOM BUILDS</span>
+        <span>EST. 2026 — OPEN PROJECT</span>
+      </div>
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-line"></span> ТЕХНОЛОГИИ БЕЗ ЛИШНЕГО</p>
+        <h1 class="hero-title"><span class="hero-title-main">Собери своё</span><span class="hero-title-brand">POSPOLITE.</span></h1>
+        <div class="hero-bottom">
+          <p class="hero-description">Комплектующие для компьютеров.<br>Продуманный выбор. Чистая производительность.</p>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="Абстрактная техническая композиция">
+        <div class="art-grid"></div>
+        <div class="art-orbit orbit-one"></div>
+        <div class="art-orbit orbit-two"></div>
+        <div class="art-core"><span>Ｐ</span></div>
+        <div class="art-cross cross-one">＋</div>
+        <div class="art-cross cross-two">＋</div>
+        <div class="art-label label-top">SYSTEM / 001</div>
+        <div class="art-label label-bottom">DESIGNED TO PERFORM</div>
+        <div class="art-vertical">POSPOLITE — HARDWARE DIVISION</div>
+      </div>
+      <div class="hero-footerline">
+        <a class="hero-index-link" href="#catalog" data-section-link="catalog">01 — HARDWARE</a><a class="hero-index-link" href="#intro" data-section-link="intro">02 — PERFORMANCE</a><a class="hero-index-link" href="#about" data-section-link="about">03 — FREEDOM</a>
+        <span class="scroll-hint">SCROLL TO EXPLORE ↓</span>
+      </div>
+    </section>
+
+    <section class="intro section-shell" id="intro">
+      <div class="section-kicker"><span>01 / INTRODUCTION</span><span>КТО МЫ</span></div>
+      <div class="intro-content">
+        <h2>Меньше шума.<br><span>Больше смысла.</span></h2>
+        <div class="intro-text">
+          <p>POSPOLITE — небольшой независимый проект о компьютерном железе. Мы начинаем с каталога комплектующих и постепенно развиваем идею собственного магазина.</p>
+          <a class="text-link" href="#about">УЗНАТЬ О ПРОЕКТЕ <span>↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="catalog-section section-shell" id="catalog">
+      <div class="section-kicker"><span>02 / CATALOG</span><span>ВЫБИРАЙ КОМПОНЕНТЫ</span></div>
+      <div class="section-heading">
+        <h2>КАТАЛОГ<span class="heading-period">.</span></h2>
+        <p>БАЗА ДЛЯ ТВОЕЙ<br>СЛЕДУЮЩЕЙ СБОРКИ.</p>
+      </div>
+      <div class="category-grid">
+        <a class="category-card category-large" href={`${base}catalog/gpu/`}>
+          <div class="category-number">01 / GPU</div>
+          <div class="component-visual gpu-visual"><div class="gpu-body"><span>POS / GRAPHICS</span><i></i><b></b></div></div>
+          <div class="category-info"><h3>Видеокарты</h3><span>↗</span></div>
+        </a>
+        <a class="category-card" href={`${base}catalog/cpu/`}>
+          <div class="category-number">02 / CPU</div>
+          <div class="component-visual cpu-visual"><div class="cpu-chip"><span>CORE</span><b>01</b></div></div>
+          <div class="category-info"><h3>Процессоры</h3><span>↗</span></div>
+        </a>
+        <a class="category-card" href={`${base}catalog/ram/`}>
+          <div class="category-number">03 / RAM</div>
+          <div class="component-visual ram-visual"><div class="ram-stick"><i></i><i></i><i></i><i></i><i></i></div></div>
+          <div class="category-info"><h3>Оперативная память</h3><span>↗</span></div>
+        </a>
+        <a class="category-card" href={`${base}catalog/motherboards/`}>
+          <div class="category-number">04 / MB</div>
+          <div class="component-visual board-visual"><div class="board"><i></i><b></b><span></span></div></div>
+          <div class="category-info"><h3>Материнские платы</h3><span>↗</span></div>
+        </a>
+        <a class="category-card" href={`${base}catalog/psu/`}>
+          <div class="category-number">05 / POWER</div>
+          <div class="component-visual storage-visual"><div class="ssd-drive"><span>POS / POWER</span><b>450W</b><i></i></div></div>
+          <div class="category-info"><h3>Блоки питания</h3><span>↗</span></div>
+        </a>
+        <a class="category-card" href={`${base}catalog/cooling/`}>
+          <div class="category-number">06 / COOLING</div>
+          <div class="component-visual cpu-visual"><div class="cpu-chip"><span>COOL</span><b>FAN</b></div></div>
+          <div class="category-info"><h3>Охлаждение</h3><span>↗</span></div>
+        </a>
+        <a class="category-card" href={`${base}catalog/keyboards/`}>
+          <div class="category-number">07 / KEYBOARD</div>
+          <div class="component-visual ram-visual"><div class="ram-stick"><i></i><i></i><i></i><i></i><i></i></div></div>
+          <div class="category-info"><h3>Клавиатуры</h3><span>↗</span></div>
+        </a>
+        <a class="category-card" href={`${base}catalog/mice/`}>
+          <div class="category-number">08 / MOUSE</div>
+          <div class="component-visual cpu-visual"><div class="cpu-chip"><span>INPUT</span><b>M</b></div></div>
+          <div class="category-info"><h3>Мыши</h3><span>↗</span></div>
+        </a>
+        <a class="category-card" href={`${base}catalog/audio/`}>
+          <div class="category-number">09 / AUDIO</div>
+          <div class="component-visual board-visual"><div class="board"><i></i><b></b><span></span></div></div>
+          <div class="category-info"><h3>Аудио</h3><span>↗</span></div>
+        </a>
+        <a class="category-card" href={`${base}catalog/monitors/`}>
+          <div class="category-number">10 / DISPLAY</div>
+          <div class="component-visual storage-visual"><div class="ssd-drive"><span>POS / DISPLAY</span><b>LCD</b><i></i></div></div>
+          <div class="category-info"><h3>Мониторы</h3><span>↗</span></div>
+        </a>
+        <a class="category-card" href={`${base}catalog/cases/`}>
+          <div class="category-number">11 / CASE</div>
+          <div class="component-visual gpu-visual"><div class="gpu-body"><span>POS / CASE</span><i></i><b></b></div></div>
+          <div class="category-info"><h3>Корпуса</h3><span>↗</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="about-section section-shell" id="about">
+      <div class="section-kicker"><span>03 / ABOUT</span><span>НАШ ПОДХОД</span></div>
+      <div class="about-grid">
+        <h2>СОЗДАЁМ<br>ОТКРЫТО.</h2>
+        <div class="about-copy">
+          <p>Мы верим, что технологии должны быть понятными и доступными. Поэтому POSPOLITE развивается как открытый проект: исходный код доступен каждому, а идеи сообщества помогают ему становиться лучше.</p>
+          <div class="principles">
+            <div><span>01</span><b>OPEN SOURCE</b><small>Код открыт для изучения</small></div>
+            <div><span>02</span><b>COMMUNITY</b><small>Развиваемся вместе</small></div>
+            <div><span>03</span><b>SIMPLICITY</b><small>Ничего лишнего</small></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-strip" id="contacts">
+      <div><span class="eyebrow">04 / GET IN TOUCH</span><h2>ЕСТЬ ВОПРОС?</h2></div>
+      <p>POSPOLITE только начинает свой путь.<br>Следи за обновлениями проекта.</p>
+      <a href="https://discord.gg/5xtcNRp36" target="_blank" rel="noreferrer" class="github-link magnetic">DISCORD <span>↗</span></a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-main">
+      <a class="wordmark footer-wordmark" href="#home">POSPOLITE<span class="wordmark-mark">®</span></a>
+      <p>OPEN BY DEFAULT.<br>BUILT WITH CURIOSITY.</p>
+      <div class="footer-links"><a href="#home">Главная</a><a href="#catalog">Каталог</a><a href="#about">О проекте</a><a href="https://github.com/swittyy/pospolite" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://discord.gg/5xtcNRp36" target="_blank" rel="noreferrer">Discord ↗</a><a href="https://t.me/pospoliteshop" target="_blank" rel="noreferrer">Telegram ↗</a><a href={`${base}admin/`}>Админ-панель ↗</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 POSPOLITE. ВСЕ ПРАВА НА БРЕНД СОХРАНЕНЫ.</span><span>MADE FOR THE CURIOUS.</span><a href="#home">НАВЕРХ ↑</a></div>
+  </footer>
+</SiteLayout>

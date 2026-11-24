@@ -2,126 +2,89 @@
 
 **Открытый проект. Свободное программное обеспечение. Технологии для всех.**
 
-POSPOLITE — независимый проект о компьютерной технике и комплектующих. Сейчас проект включает статический сайт с предварительным каталогом; в дальнейшем планируется развитие полноценного интернет-магазина и платформы для подбора комплектующих.
+POSPOLITE — независимый проект о компьютерной технике и комплектующих. Frontend построен на Astro и TypeScript; Rust API обслуживает каталог и приватную административную панель.
 
-**Сайт:** https://pospoliteshop.ru  
 **GitHub:** https://github.com/swittyy/pospolite  
 **Discord:** https://discord.gg/5xtcNRp36  
 **Telegram:** https://t.me/pospoliteshop
 
-## О проекте
+## Стек
 
-POSPOLITE развивается открыто: исходный код доступен для изучения, а предложения сообщества помогают улучшать проект. Каталог постепенно наполняется реальными позициями. Если модель или характеристики пока неизвестны, они явно отмечаются как требующие уточнения.
+- Astro 5 + TypeScript — статический сайт.
+- Rust + Axum — API каталога и админ-панель.
+- JSON-файл — постоянное хранилище каталога на сервере.
 
-## Технологии
+## Frontend
 
-- **Frontend:** HTML, CSS, JavaScript — интерфейс сайта, адаптивная вёрстка, темы и интерактивность.
-- **Backend:** Rust — серверная часть. В репозитории добавлен начальный каркас API на Rust с HTTP-сервером и проверочным маршрутом.
-- **API:** REST-подход; серверный API будет постепенно расширяться.
-- **Frontend hosting:** GitHub Pages — публикация статического сайта.
-- **Backend hosting:** отдельный сервер или хостинг с поддержкой запуска Rust-приложений.
-
-GitHub Pages не запускает Rust-код. Поэтому frontend и backend публикуются отдельно. На текущем этапе сайт продолжает работать как статический frontend; Rust API пока не подключён к каталогу.
-
-## Backend на Rust
-
-Исходники backend находятся в `src/main.rs`, конфигурация Cargo — в `Cargo.toml`.
-
-Текущий стартовый сервер:
-- запускает HTTP API;
-- предоставляет `GET /api/health` для проверки доступности;
-- возвращает JSON со статусом сервиса.
-
-Запуск локально при установленном Rust toolchain:
+Требуется Node.js 20.3.0 или новее.
 
 ```bash
-cargo run
+npm install
+npm run dev
+npm run check
+npm run build
 ```
 
-По умолчанию сервер слушает `127.0.0.1:3000`. Проверка:
+Для подключения динамического каталога укажи адрес Rust API во время сборки:
 
 ```bash
-curl http://127.0.0.1:3000/api/health
+PUBLIC_API_URL=https://your-api.example.com npm run build
 ```
 
-Это начальная основа, а не готовая коммерческая backend-система: база данных, авторизация, заказы, склад и интеграция с frontend ещё не реализованы.
+Без `PUBLIC_API_URL` сайт продолжит показывать встроенный статический каталог.
 
-## Структура проекта
+## Rust API и админка
 
-```text
-.
-├── index.html
-├── category.html
-├── css/
-│   └── style.css
-├── js/
-│   ├── main.js
-│   └── catalog.js
-├── src/
-│   └── main.rs
-├── Cargo.toml
-├── README.md
-└── LICENSE
+API должен работать на отдельном сервере с постоянным диском. GitHub Pages не запускает Rust-процессы.
+
+Перед запуском задай пароль администратора через переменную окружения `POSPOLITE_ADMIN_TOKEN` (минимум 12 символов). Не записывай пароль в репозиторий или frontend. Для публичного сервера используй длинный уникальный секрет:
+
+```bash
+read -rsp "Admin password: " POSPOLITE_ADMIN_TOKEN; echo\nexport POSPOLITE_ADMIN_TOKEN
+export POSPOLITE_CATALOG_PATH="./data/catalog.json"
+cargo run --release
 ```
 
-## План развития
+API слушает `0.0.0.0:$PORT` (по умолчанию порт 3000).
 
-- [x] Статический сайт и адаптивный интерфейс.
-- [x] Светлая, тёмная и системная темы.
-- [x] Предварительный каталог товаров.
-- [x] Начальный Rust API с health-check.
-- [ ] Подключение базы данных и управление каталогом.
-- [ ] Подключение frontend к backend API.
-- [ ] Поиск и фильтрация товаров.
-- [ ] Корзина и оформление заказов.
-- [ ] Учёт остатков и административная панель.
-- [ ] Подбор и конфигуратор сборок ПК.
+Эндпоинты:
 
-Отмеченные как планируемые функции ещё не реализованы.
+- `GET /api/health` — состояние API.
+- `GET /api/catalog` — публичный каталог.
+- `POST /api/admin/session` — проверка токена администратора.
+- `PUT /api/admin/catalog` — сохранение каталога; требует `Authorization: Bearer <token>`.
 
-## Участие в проекте
+При первом запуске каталог инициализируется данными из `data/catalog.json`. Последующие изменения записываются в `POSPOLITE_CATALOG_PATH`. Убедись, что каталог данных находится на постоянном диске, а не во временной файловой системе контейнера.
 
-Приветствуются идеи, предложения, сообщения об ошибках и Pull Requests. Перед отправкой изменений желательно описать, что именно меняется и зачем.
+### Административная панель
 
-## Лицензия
+Открой `/admin/` на опубликованном сайте. Введи пароль администратора. Адрес API задаётся при сборке через `PUBLIC_API_URL`. После успешной проверки откроется панель с анимированным переходом. В ней можно редактировать товары, цены, характеристики, примечания и наличие, добавлять и удалять товары и категории. Кнопка сохранения записывает изменения на сервер.
 
-Проект распространяется под лицензией **MIT**. Подробности — в файле [LICENSE](LICENSE).
+**Безопасность:** используй HTTPS для API, длинный уникальный токен и не вставляй секрет в исходники сайта. Токен хранится только в памяти вкладки и не сохраняется в localStorage. CORS разрешает браузерные запросы с любых origin, но все операции записи защищены Bearer-токеном; для публичного развёртывания рекомендуется дополнительно ограничить origin на уровне reverse proxy.
 
----
+### Развёртывание на GitHub Pages
 
-# POSPOLITE
+1. В настройках репозитория открой **Settings → Pages → Build and deployment** и выбери **GitHub Actions** как источник публикации.
+2. Workflow `.github/workflows/deploy-pages.yml` собирает Astro и публикует `dist/` при каждом push в `main`.
+3. Сайт проекта доступен по адресу `https://swittyy.github.io/pospolite/`, панель — `https://swittyy.github.io/pospolite/admin/`.
 
-**Open project. Free software. Technology for everyone.**
+### Подключение авторизации и сохранения
 
-POSPOLITE is an independent project focused on computer hardware and components. The current repository contains a static website with a preliminary product catalog. The long-term goal is to grow it into a full online store and a platform for choosing PC components.
+GitHub Pages публикует только статические файлы. Он не запускает Rust API и не может хранить секрет администратора. Для реального входа и сохранения каталога нужен отдельный HTTPS API с `POSPOLITE_ADMIN_TOKEN` и постоянным хранилищем. Не помещай токен в исходники, GitHub Pages или клиентский JavaScript. После запуска API собери frontend с `PUBLIC_API_URL`, указывающим на его адрес.
 
-**Website:** https://pospoliteshop.ru  
-**GitHub:** https://github.com/swittyy/pospolite  
-**Discord:** https://discord.gg/5xtcNRp36  
-**Telegram:** https://t.me/pospoliteshop
+## Структура
 
-## Technology Stack
+- `src/pages/admin.astro` — панель управления.
+- `src/pages/catalog/[type].astro` — страницы категорий.
+- `src/data/catalog.ts` — данные для статической сборки.
+- `data/catalog.json` — стартовый каталог и серверное хранилище.
+- `src/main.rs` — Rust API.
 
-- **Frontend:** HTML, CSS and JavaScript.
-- **Backend:** Rust. An initial HTTP API scaffold is included.
-- **API:** REST-style endpoints, to be expanded.
-- **Frontend hosting:** GitHub Pages.
-- **Backend hosting:** a separate host capable of running Rust applications.
+## Статус
 
-GitHub Pages serves static files and cannot execute Rust. The current frontend remains static and is not connected to the Rust API yet.
-
-## Rust Backend
-
-The backend source is in `src/main.rs`, with its Cargo configuration in `Cargo.toml`.
-
-The initial server exposes `GET /api/health`, returning a JSON health status. Run it locally with `cargo run`; it listens on `127.0.0.1:3000` by default.
-
-This is only a foundation. Database storage, authentication, inventory, orders and frontend integration are not implemented yet.
-
-## Contributing
-
-Ideas, suggestions, bug reports and pull requests are welcome.
-
-## License
-
-Licensed under the **MIT License**. See [LICENSE](LICENSE).
+- [x] Astro frontend и каталог.
+- [x] Админ-панель с токен-аутентификацией.
+- [x] API чтения и сохранения каталога.
+- [x] JSON persistence и управление товарами/наличием.
+- [ ] Развёртывание Rust API на постоянном сервере.
+- [ ] Настройка PUBLIC_API_URL и публикация обновлённого frontend.
