@@ -261,7 +261,6 @@
   document.addEventListener("visibilitychange", () => {
     body.classList.toggle("page-hidden", document.hidden);
   });
-})();
 
   // Hero index follows the section currently in view.
   const indexLinks = [...document.querySelectorAll("[data-section-link]")];
@@ -294,3 +293,4 @@
       link.addEventListener("click", () => setActiveIndex(link.dataset.sectionLink));
     });
   }
+})();

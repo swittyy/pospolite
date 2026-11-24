@@ -51,15 +51,16 @@ curl http://127.0.0.1:3000/api/health
 ```text
 .
 ├── index.html
+├── category.html
 ├── css/
 │   └── style.css
 ├── js/
-│   └── main.js
+│   ├── main.js
+│   └── catalog.js
 ├── src/
 │   └── main.rs
 ├── Cargo.toml
 ├── README.md
-├── README-STARTER.txt
 └── LICENSE
 ```
 
