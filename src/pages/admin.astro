@@ -1,10 +1,9 @@
 ---
 import SiteLayout from "../layouts/SiteLayout.astro";
-import { categories } from "../data/catalog";
 const apiBase = import.meta.env.PUBLIC_API_URL ?? "";
 ---
-<SiteLayout title="Админ-панель — POSPOLITE" description="Управление каталогом POSPOLITE.">
-  <main class="admin-shell" data-api-base={apiBase} data-initial-catalog={JSON.stringify({ categories })}>
+<SiteLayout title="Админ-панель — POSPOLITE" description="Управление каталогом POSPOLITE." noindex>
+  <main class="admin-shell" data-api-base={apiBase}>
     <header class="admin-top"><a class="wordmark" href={import.meta.env.BASE_URL}>POSPOLITE<span class="wordmark-mark">®</span></a><span>CONTROL PANEL / 001</span><a href={import.meta.env.BASE_URL}>НА САЙТ ↗</a></header>
     <section class="admin-intro"><p class="eyebrow">POSPOLITE / MANAGEMENT</p><h1>УПРАВЛЕНИЕ<span>.</span></h1><p>Каталог, цены и наличие — в одном месте.</p></section>
     <section class="admin-login" id="login-panel">
@@ -139,45 +138,55 @@ body{background:var(--adm-bg)!important}
 @media(prefers-reduced-motion:reduce){.login-orbit,.login-orbit:before,.login-orbit:after,.boot-mark,.boot-track i,.login-copy:after{animation:none!important}.boot-track i{width:100%}}
 </style>
 <script>
-const shell = document.querySelector(".admin-shell");
-const loginForm = document.querySelector("#login-form");
-const workspace = document.querySelector("#workspace");
-const loginPanel = document.querySelector("#login-panel");
-const tokenInput = document.querySelector("#admin-token");
-const loginMessage = document.querySelector("#login-message");
-const saveMessage = document.querySelector("#save-message");
-const bootScreen = document.querySelector("#boot-screen");
-const bootCaption = document.querySelector("#boot-caption");
+type Availability = "unknown" | "in_stock" | "out_of_stock";
+interface Product { code: string; name: string; details: string; price: string; note: string; symbol: string; availability: Availability; }
+interface Category { slug: string; title: string; index: string; description: string; products: Product[]; }
+interface Catalog { categories: Category[]; }
+const errorText = (error: unknown): string => (error instanceof Error ? error.message : String(error));
+const $ = <T extends HTMLElement = HTMLElement>(selector: string): T => {
+  const node = document.querySelector<T>(selector);
+  if (!node) throw new Error(`Missing element: ${selector}`);
+  return node;
+};
+const shell = $(".admin-shell");
+const loginForm = $<HTMLFormElement>("#login-form");
+const workspace = $("#workspace");
+const loginPanel = $("#login-panel");
+const tokenInput = $<HTMLInputElement>("#admin-token");
+const loginMessage = $("#login-message");
+const saveMessage = $("#save-message");
+const bootScreen = $("#boot-screen");
+const bootCaption = $("#boot-caption");
 const apiBase = (shell.dataset.apiBase || "").replace(/\/$/, "");
 let token = "";
-let catalog = { categories: [] };
+let catalog: Catalog = { categories: [] };
 let selectedSlug = "";
 let isSaving = false;
-const api = async (path, options = {}) => {
+const api = async <T,>(path: string, options: RequestInit = {}): Promise<T> => {
   if (!apiBase) throw new Error("Сервер управления пока не подключён. Нужен запущенный POSPOLITE API.");
   const response = await fetch(apiBase + path, {
     ...options,
-    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(options.headers || {}) }
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), ...((options.headers as Record<string, string> | undefined) || {}) }
   });
   const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || `Ошибка сервера ${response.status}`);
-  return data;
+  if (!response.ok) throw new Error((data as { error?: string }).error || `Ошибка сервера ${response.status}`);
+  return data as T;
 };
-const el = (tag, attrs = {}, text = "") => {
+const el = <K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string> = {}, text = ""): HTMLElementTagNameMap[K] => {
   const node = document.createElement(tag);
   Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
   if (text) node.textContent = text;
   return node;
 };
-function setMessage(node, text, state = "") { node.textContent = text; node.dataset.state = state; }
+function setMessage(node: HTMLElement, text: string, state = "") { node.textContent = text; node.dataset.state = state; }
 function render() {
   const categories = catalog.categories || [];
   const products = categories.reduce((sum, category) => sum + category.products.length, 0);
-  document.querySelector("#stat-categories").textContent = categories.length;
-  document.querySelector("#stat-products").textContent = products;
-  document.querySelector("#stat-unknown").textContent = categories.flatMap(c => c.products).filter(p => p.availability === "unknown").length;
-  document.querySelector("#catalog-count").textContent = `${products} ПОЗИЦИЙ`;
-  const list = document.querySelector("#category-list");
+  $("#stat-categories").textContent = String(categories.length);
+  $("#stat-products").textContent = String(products);
+  $("#stat-unknown").textContent = categories.flatMap(c => c.products).filter(p => p.availability === "unknown").length.toString();
+  $("#catalog-count").textContent = `${products} ПОЗИЦИЙ`;
+  const list = $("#category-list");
   list.replaceChildren();
   categories.forEach((category, index) => {
     const button = el("button", { class: "category-choice", type: "button", "aria-current": String(category.slug === selectedSlug) });
@@ -188,18 +197,18 @@ function render() {
     list.append(button);
   });
   const category = categories.find(c => c.slug === selectedSlug);
-  const editor = document.querySelector("#category-editor");
-  const productList = document.querySelector("#product-list");
+  const editor = $("#category-editor");
+  const productList = $("#product-list");
   editor.replaceChildren(); productList.replaceChildren();
-  document.querySelector("#selected-category-label").textContent = category ? category.title : "ВЫБЕРИ КАТЕГОРИЮ";
-  document.querySelector("#delete-category-button").hidden = !category;
-  document.querySelector("#add-product-button").hidden = !category;
+  $("#selected-category-label").textContent = category ? category.title : "ВЫБЕРИ КАТЕГОРИЮ";
+  $("#delete-category-button").hidden = !category;
+  $("#add-product-button").hidden = !category;
   if (!category) {
     productList.append(el("div", { class: "empty-editor" }, "Выбери раздел слева или создай новую категорию."));
     return;
   }
   const categoryForm = el("div", { class: "category-form" });
-  const fields = [["НАЗВАНИЕ РАЗДЕЛА", "title"], ["URL SLUG", "slug"], ["КОРОТКИЙ ИНДЕКС", "index"], ["ОПИСАНИЕ", "description"]];
+  const fields: [string, "title" | "slug" | "index" | "description"][] = [["НАЗВАНИЕ РАЗДЕЛА", "title"], ["URL SLUG", "slug"], ["КОРОТКИЙ ИНДЕКС", "index"], ["ОПИСАНИЕ", "description"]];
   fields.forEach(([label, key]) => {
     const wrap = el("label", {}, label);
     const input = el(key === "description" ? "textarea" : "input", { value: category[key] || "", placeholder: key === "slug" ? "например storage" : label });
@@ -222,7 +231,7 @@ function render() {
     remove.addEventListener("click", () => { category.products.splice(index, 1); render(); });
     head.append(remove); row.append(head);
     const form = el("div", { class: "product-form" });
-    const productFields = [
+    const productFields: [string, "name" | "price" | "code" | "details" | "note" | "symbol", string][] = [
       ["НАЗВАНИЕ ТОВАРА", "name", "Например, GeForce RTX 3060"],
       ["ЦЕНА", "price", "Например, 24 990 ₽"],
       ["АРТИКУЛ / КОД", "code", "Например, GPU-3060"],
@@ -242,25 +251,25 @@ function render() {
     [["unknown","Не указано"],["in_stock","В наличии"],["out_of_stock","Нет в наличии"]].forEach(([value,label]) => {
       const option = el("option", { value }, label); option.selected = product.availability === value; status.append(option);
     });
-    status.addEventListener("change", () => { product.availability = status.value; });
+    status.addEventListener("change", () => { product.availability = status.value as Availability; });
     statusWrap.append(status); form.append(statusWrap); row.append(form); productList.append(row);
   });
 }
-document.querySelector("#add-product-button").addEventListener("click", () => {
+$("#add-product-button").addEventListener("click", () => {
   const category = catalog.categories.find(c => c.slug === selectedSlug);
   if (!category) return;
   category.products.push({ code:"", name:"", details:"", price:"", note:"", symbol:"", availability:"unknown" });
   render();
-  document.querySelector("#product-list .product-row:last-child input")?.focus();
+  document.querySelector<HTMLInputElement>("#product-list .product-row:last-child input")?.focus();
 });
-document.querySelector("#add-category-button").addEventListener("click", () => {
-  const mount = document.querySelector("#category-create");
+$("#add-category-button").addEventListener("click", () => {
+  const mount = $("#category-create");
   mount.hidden = !mount.hidden;
   if (mount.hidden) return;
   mount.replaceChildren();
   const form = el("form", { class: "new-category-form" });
   const title = el("input", { placeholder: "Например, SSD-накопители", required: "true" });
-  const slug = el("input", { placeholder: "ssd", required: "true", pattern: "[a-z0-9-]+" });
+  const slug = el("input", { placeholder: "ssd", required: "true", pattern: "[a-z0-9\\-]+" });
   const create = el("button", { type: "submit" }, "СОЗДАТЬ РАЗДЕЛ ↗");
   form.append(el("small", {}, "НОВЫЙ РАЗДЕЛ"), title, slug, create);
   title.addEventListener("input", () => { if (!slug.dataset.edited) slug.value = title.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); });
@@ -276,28 +285,28 @@ document.querySelector("#add-category-button").addEventListener("click", () => {
   });
   mount.append(form); title.focus();
 });
-document.querySelector("#delete-category-button").addEventListener("click", () => {
+$("#delete-category-button").addEventListener("click", () => {
   const index = catalog.categories.findIndex(c => c.slug === selectedSlug);
   if (index < 0 || !confirm(`Удалить раздел «${catalog.categories[index].title}» вместе со всеми товарами?`)) return;
   catalog.categories.splice(index, 1); selectedSlug = catalog.categories[0]?.slug || ""; render();
 });
-document.querySelector("#save-button").addEventListener("click", async () => {
+$("#save-button").addEventListener("click", async () => {
   if (isSaving) return;
-  isSaving = true; const button = document.querySelector("#save-button"); button.disabled = true;
+  isSaving = true; const button = $<HTMLButtonElement>("#save-button"); button.disabled = true;
   setMessage(saveMessage, "СОХРАНЯЕМ КАТАЛОГ…");
   try {
     await api("/api/admin/catalog", { method:"PUT", body:JSON.stringify(catalog) });
     setMessage(saveMessage, "✓ ВСЁ СОХРАНЕНО НА СЕРВЕРЕ", "success");
     render();
-  } catch (error) { setMessage(saveMessage, error.message, "error"); }
+  } catch (error) { setMessage(saveMessage, errorText(error), "error"); }
   finally { isSaving = false; button.disabled = false; }
 });
-document.querySelector("#refresh-button").addEventListener("click", async () => {
+$("#refresh-button").addEventListener("click", async () => {
   setMessage(saveMessage, "ЗАГРУЖАЕМ ПОСЛЕДНЮЮ ВЕРСИЮ…");
   try { await loadCatalog(false); setMessage(saveMessage, "КАТАЛОГ ОБНОВЛЁН.", "success"); }
-  catch (error) { setMessage(saveMessage, error.message, "error"); }
+  catch (error) { setMessage(saveMessage, errorText(error), "error"); }
 });
-document.querySelector("#logout-button").addEventListener("click", () => {
+$("#logout-button").addEventListener("click", () => {
   token = ""; catalog = { categories: [] }; workspace.hidden = true; loginPanel.hidden = false;
   tokenInput.value = ""; setMessage(loginMessage, "СЕАНС ЗАВЕРШЁН."); tokenInput.focus();
 });
@@ -306,7 +315,7 @@ async function loadCatalog(showBoot = true) {
     loginPanel.hidden = true; bootScreen.hidden = false;
     bootCaption.textContent = "СИНХРОНИЗАЦИЯ КАТАЛОГА";
   }
-  const data = await api("/api/catalog");
+  const data = await api<Catalog>("/api/catalog");
   catalog = data; selectedSlug = catalog.categories[0]?.slug || "";
   if (showBoot) {
     bootCaption.textContent = "СИСТЕМА ГОТОВА";
@@ -315,15 +324,15 @@ async function loadCatalog(showBoot = true) {
   }
   workspace.hidden = false; render();
 }
-document.querySelector("#toggle-password").addEventListener("click", () => {
+$("#toggle-password").addEventListener("click", () => {
   const show = tokenInput.type === "password"; tokenInput.type = show ? "text" : "password";
-  document.querySelector("#toggle-password").textContent = show ? "◎" : "◉";
+  $("#toggle-password").textContent = show ? "◎" : "◉";
 });
 loginForm.addEventListener("submit", async event => {
   event.preventDefault();
   const password = tokenInput.value;
   if (!password) return;
-  const submit = document.querySelector("#login-submit");
+  const submit = $<HTMLButtonElement>("#login-submit");
   submit.disabled = true; setMessage(loginMessage, "СВЯЗЫВАЕМСЯ С СЕРВЕРОМ…");
   try {
     token = password;
@@ -334,7 +343,7 @@ loginForm.addEventListener("submit", async event => {
     await loadCatalog(true);
   } catch (error) {
     token = ""; bootScreen.hidden = true; loginPanel.hidden = false;
-    setMessage(loginMessage, error.message === "Failed to fetch" ? "СЕРВЕР НЕДОСТУПЕН. API ЕЩЁ НЕ ПОДКЛЮЧЁН." : error.message, "error");
+    setMessage(loginMessage, errorText(error) === "Failed to fetch" ? "СЕРВЕР НЕДОСТУПЕН. API ЕЩЁ НЕ ПОДКЛЮЧЁН." : errorText(error), "error");
     tokenInput.select();
   } finally { submit.disabled = false; }
 });

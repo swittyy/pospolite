@@ -42,7 +42,12 @@
   };
   const params = new URLSearchParams(location.search);
   const key = params.get("type");
-  const category = categories[key];
+  // Object.hasOwn: ?type=constructor or ?type=__proto__ must not match inherited properties.
+  const category = key !== null && Object.hasOwn(categories, key) ? categories[key] : undefined;
+  // Escape text before inserting it as HTML, so future API data cannot inject markup.
+  const esc = (value) => String(value).replace(/[&<>"']/g, (char) => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]
+  ));
   const title = document.getElementById("category-title");
   const index = document.getElementById("category-index");
   const description = document.getElementById("category-description");
@@ -63,10 +68,10 @@
   }
   grid.innerHTML = category.products.map((product, i) => `
     <article class="catalog-product">
-      <div class="catalog-product-meta"><span>${product.code}</span><span>${String(i + 1).padStart(2,"0")}</span></div>
-      <div class="catalog-product-symbol">${product.symbol}</div>
-      <h2>${product.name}</h2>
-      <p>${product.details}</p>
-      <div class="catalog-product-bottom"><strong>${product.price}</strong><span>${product.note}</span></div>
+      <div class="catalog-product-meta"><span>${esc(product.code)}</span><span>${String(i + 1).padStart(2,"0")}</span></div>
+      <div class="catalog-product-symbol">${esc(product.symbol)}</div>
+      <h2>${esc(product.name)}</h2>
+      <p>${esc(product.details)}</p>
+      <div class="catalog-product-bottom"><strong>${esc(product.price)}</strong><span>${esc(product.note)}</span></div>
     </article>`).join("");
 })();

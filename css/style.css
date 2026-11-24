@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
-
+/* Fonts are loaded with <link> in each HTML page; an @import here would load them twice and block rendering. */
 :root {
   --paper: #f3f3ef;
   --ink: #111;
@@ -537,6 +536,15 @@ body, .site-header, .category-card, .catalog-section, .contact-strip, .site-foot
 .scroll-progress.on-dark { --progress-color: var(--paper); }
 .loader-track { background: var(--line); }
 .loader-track span { background: var(--ink); }
+/* The shared transition above removed the loader fade-out; restore it together with the colour transition. */
+.intro-loader {
+  transition: opacity .65s cubic-bezier(.2,.7,.2,1), visibility .65s, background-color .35s ease, color .35s ease;
+  /* Failsafe: if main.js never runs (JS disabled or failed to load), the loader must not cover the page forever. */
+  animation: loader-failsafe .01s 6s forwards;
+}
+@keyframes loader-failsafe { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+/* body.motion-ready .reveal-target (specificity) was cancelling the hover lift on category cards. */
+body.motion-ready .category-card.reveal-target.is-visible:hover { transform: translate3d(0, -3px, 0); }
 .theme-control { position: relative; z-index: 35; }
 .theme-toggle {
   min-height: 38px; display: inline-flex; align-items: center; gap: 8px;
