@@ -2,125 +2,95 @@
 
 **Открытый проект. Свободное программное обеспечение. Технологии для всех.**
 
-POSPOLITE — независимый проект о компьютерной технике и комплектующих. Сейчас проект включает статический сайт с предварительным каталогом; в дальнейшем планируется развитие полноценного интернет-магазина и платформы для подбора комплектующих.
+POSPOLITE — независимый проект о компьютерной технике и комплектующих. Сайт построен на Astro и TypeScript, каталог содержит предварительные позиции, характеристики которых при необходимости явно помечены как требующие уточнения.
 
 **Сайт:** https://pospoliteshop.ru  
 **GitHub:** https://github.com/swittyy/pospolite  
 **Discord:** https://discord.gg/5xtcNRp36  
 **Telegram:** https://t.me/pospoliteshop
 
-## О проекте
+## Стек
 
-POSPOLITE развивается открыто: исходный код доступен для изучения, а предложения сообщества помогают улучшать проект. Каталог постепенно наполняется реальными позициями. Если модель или характеристики пока неизвестны, они явно отмечаются как требующие уточнения.
+- **Astro 5** — статическая генерация страниц и компоненты.
+- **TypeScript** — типизированные данные каталога и клиентская логика.
+- **CSS** — адаптивный минималистичный интерфейс, темы и анимации.
+- **Rust / Axum** — отдельный стартовый backend API.
 
-## Технологии
+## Разработка
 
-- **Frontend:** HTML, CSS, JavaScript — интерфейс сайта, адаптивная вёрстка, темы и интерактивность.
-- **Backend:** Rust — серверная часть. В репозитории добавлен начальный каркас API на Rust с HTTP-сервером и проверочным маршрутом.
-- **API:** REST-подход; серверный API будет постепенно расширяться.
-- **Frontend hosting:** GitHub Pages — публикация статического сайта.
-- **Backend hosting:** отдельный сервер или хостинг с поддержкой запуска Rust-приложений.
+Требуется Node.js 20.3.0 или новее и npm.
 
-GitHub Pages не запускает Rust-код. Поэтому frontend и backend публикуются отдельно. На текущем этапе сайт продолжает работать как статический frontend; Rust API пока не подключён к каталогу.
+```bash
+npm install
+npm run dev
+```
 
-## Backend на Rust
+Локальный сайт будет доступен по адресу, который выведет Astro (обычно http://localhost:4321).
 
-Исходники backend находятся в `src/main.rs`, конфигурация Cargo — в `Cargo.toml`.
+Проверка типов и Astro-компонентов:
 
-Текущий стартовый сервер:
-- запускает HTTP API;
-- предоставляет `GET /api/health` для проверки доступности;
-- возвращает JSON со статусом сервиса.
+```bash
+npm run check
+```
 
-Запуск локально при установленном Rust toolchain:
+Сборка статического сайта:
+
+```bash
+npm run build
+npm run preview
+```
+
+Результат сборки находится в `dist/`. Для публикации на GitHub Pages нужно настроить workflow, который собирает проект командой `npm run build` и публикует каталог `dist/`. При подключённом домене `pospoliteshop.ru` корневой адрес уже задан в конфигурации Astro.
+
+## Структура
+
+```text
+src/
+├── data/
+│   └── catalog.ts
+├── layouts/
+│   └── SiteLayout.astro
+├── pages/
+│   ├── index.astro
+│   └── catalog/
+│       └── [type].astro
+├── scripts/
+│   └── main.ts
+└── styles/
+    └── global.css
+astro.config.mjs
+package.json
+tsconfig.json
+Cargo.toml
+src/main.rs
+```
+
+Категории генерируются статически из типизированного массива в `src/data/catalog.ts`. Чтобы добавить товар, достаточно добавить объект в массив `products` нужной категории.
+
+## Rust backend
+
+Rust API остаётся отдельным сервисом и не запускается внутри Astro или GitHub Pages. Исходники находятся в `src/main.rs`, зависимости — в `Cargo.toml`.
 
 ```bash
 cargo run
-```
-
-По умолчанию сервер слушает `127.0.0.1:3000`. Проверка:
-
-```bash
 curl http://127.0.0.1:3000/api/health
 ```
 
-Это начальная основа, а не готовая коммерческая backend-система: база данных, авторизация, заказы, склад и интеграция с frontend ещё не реализованы.
-
-## Структура проекта
-
-```text
-.
-├── index.html
-├── css/
-│   └── style.css
-├── js/
-│   └── main.js
-├── src/
-│   └── main.rs
-├── Cargo.toml
-├── README.md
-├── README-STARTER.txt
-└── LICENSE
-```
+Сейчас API предоставляет только `GET /api/health`. База данных, авторизация, заказы, склад и интеграция с каталогом ещё не реализованы.
 
 ## План развития
 
-- [x] Статический сайт и адаптивный интерфейс.
+- [x] Статический интерфейс и адаптивная вёрстка.
 - [x] Светлая, тёмная и системная темы.
-- [x] Предварительный каталог товаров.
-- [x] Начальный Rust API с health-check.
-- [ ] Подключение базы данных и управление каталогом.
-- [ ] Подключение frontend к backend API.
-- [ ] Поиск и фильтрация товаров.
-- [ ] Корзина и оформление заказов.
+- [x] Каталог из 11 категорий.
+- [x] Типизированные данные каталога.
+- [x] Astro static pages.
+- [ ] Автоматизированная публикация Astro `dist/` на GitHub Pages.
+- [ ] Подключение каталога к Rust API и базе данных.
+- [ ] Поиск, фильтрация, корзина и заказы.
 - [ ] Учёт остатков и административная панель.
-- [ ] Подбор и конфигуратор сборок ПК.
+- [ ] Конфигуратор сборок ПК.
 
-Отмеченные как планируемые функции ещё не реализованы.
+## Участие и лицензия
 
-## Участие в проекте
-
-Приветствуются идеи, предложения, сообщения об ошибках и Pull Requests. Перед отправкой изменений желательно описать, что именно меняется и зачем.
-
-## Лицензия
-
-Проект распространяется под лицензией **MIT**. Подробности — в файле [LICENSE](LICENSE).
-
----
-
-# POSPOLITE
-
-**Open project. Free software. Technology for everyone.**
-
-POSPOLITE is an independent project focused on computer hardware and components. The current repository contains a static website with a preliminary product catalog. The long-term goal is to grow it into a full online store and a platform for choosing PC components.
-
-**Website:** https://pospoliteshop.ru  
-**GitHub:** https://github.com/swittyy/pospolite  
-**Discord:** https://discord.gg/5xtcNRp36  
-**Telegram:** https://t.me/pospoliteshop
-
-## Technology Stack
-
-- **Frontend:** HTML, CSS and JavaScript.
-- **Backend:** Rust. An initial HTTP API scaffold is included.
-- **API:** REST-style endpoints, to be expanded.
-- **Frontend hosting:** GitHub Pages.
-- **Backend hosting:** a separate host capable of running Rust applications.
-
-GitHub Pages serves static files and cannot execute Rust. The current frontend remains static and is not connected to the Rust API yet.
-
-## Rust Backend
-
-The backend source is in `src/main.rs`, with its Cargo configuration in `Cargo.toml`.
-
-The initial server exposes `GET /api/health`, returning a JSON health status. Run it locally with `cargo run`; it listens on `127.0.0.1:3000` by default.
-
-This is only a foundation. Database storage, authentication, inventory, orders and frontend integration are not implemented yet.
-
-## Contributing
-
-Ideas, suggestions, bug reports and pull requests are welcome.
-
-## License
-
-Licensed under the **MIT License**. See [LICENSE](LICENSE).
+Идеи, предложения, сообщения об ошибках и Pull Requests приветствуются. Проект распространяется по лицензии MIT — см. [LICENSE](LICENSE).
