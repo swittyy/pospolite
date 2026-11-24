@@ -110,6 +110,25 @@ const animateCipher = (element: HTMLElement, target: string, duration: number): 
   };
   window.requestAnimationFrame(frame);
 };
+
+// Decode only the wordmark text node so the registered mark remains untouched.
+const loaderWordmarkText = loader?.querySelector<HTMLElement>(".loader-wordmark")?.firstChild;
+if (!reduceMotion && loaderWordmarkText instanceof Text) {
+  const target = loaderWordmarkText.data;
+  const chars = [...target];
+  loaderWordmarkText.data = randomCipher(target);
+  const started = performance.now();
+  const decodeWordmark = (now: number): void => {
+    const progress = Math.min(1, (now - started) / 1050);
+    const settled = Math.floor(progress * chars.length);
+    loaderWordmarkText.data = chars.map((char, index) =>
+      /\\s/.test(char) || index < settled ? char : cipherGlyphs[Math.floor(Math.random() * cipherGlyphs.length)]
+    ).join("");
+    if (progress < 1) window.requestAnimationFrame(decodeWordmark);
+    else loaderWordmarkText.data = target;
+  };
+  window.requestAnimationFrame(decodeWordmark);
+}
 type CipherText = { node: Text; original: string };
 const cipheredNodes = new WeakSet<Text>();
 const textNodes: CipherText[] = [];
