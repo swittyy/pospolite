@@ -38,6 +38,22 @@ const base = import.meta.env.BASE_URL;
 <style>
 .category-page{min-height:65vh;padding:clamp(54px,8vw,100px) 4.2%;background:var(--paper,#f3f3ef)}.category-page-top{display:flex;justify-content:space-between;gap:20px;color:var(--muted,#777);font:9px var(--mono,monospace);letter-spacing:.08em;border-bottom:1px solid var(--line,#d4d4ce);padding-bottom:18px}.category-page h1{margin:50px 0 12px;font-size:clamp(44px,8vw,100px);line-height:.95;letter-spacing:-.075em}.category-page-intro{color:var(--muted,#777);font:10px/1.8 var(--mono,monospace)}.catalog-products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:44px}.catalog-product{min-height:245px;padding:16px;display:flex;flex-direction:column;background:var(--card,#fff);border:1px solid var(--line,#d4d4ce)}.catalog-product-meta{display:flex;justify-content:space-between;color:var(--muted,#777);font:8px var(--mono,monospace)}.catalog-product-symbol{display:grid;place-items:center;width:76px;height:76px;margin:24px auto;border:1px solid var(--line,#d4d4ce);border-radius:50%;font:15px var(--mono,monospace)}.catalog-product h2{margin:auto 0 8px;font-size:14px;line-height:1.45}.catalog-product p{margin:0;min-height:32px;color:var(--muted,#777);font-size:10px;line-height:1.6}.catalog-product-bottom{display:flex;justify-content:space-between;align-items:end;gap:8px;margin-top:15px;padding-top:12px;border-top:1px solid var(--line,#d4d4ce)}.catalog-product-bottom strong{font-size:16px;white-space:nowrap}.catalog-product-bottom span{color:var(--muted,#777);font:7px/1.5 var(--mono,monospace);text-align:right}.catalog-empty{margin-top:40px;padding:28px;border:1px solid var(--line,#d4d4ce);color:var(--muted,#777);font:10px/1.8 var(--mono,monospace)}.category-back{display:inline-flex;gap:14px;margin-top:38px;padding-bottom:8px;border-bottom:1px solid currentColor;font:9px var(--mono,monospace)}
 @media(max-width:900px){.catalog-products{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:650px){.catalog-products{grid-template-columns:repeat(2,minmax(0,1fr))}.category-page{padding-left:5%;padding-right:5%}}@media(max-width:380px){.catalog-products{grid-template-columns:1fr}}
+
+/* Cards rendered by the client after the API response do not receive Astro's
+   scoped style attribute. Keep their presentation global so API and static
+   catalog cards look identical. */
+:global(.catalog-product) { min-height:245px; padding:16px; display:flex; flex-direction:column; background:var(--card,#fff); border:1px solid var(--line,#d4d4ce); }
+:global(.catalog-product-meta) { display:flex; justify-content:space-between; color:var(--muted,#777); font:8px var(--mono,monospace); }
+:global(.catalog-product-symbol) { display:grid; place-items:center; width:76px; height:76px; margin:24px auto; border:1px solid var(--line,#d4d4ce); border-radius:50%; font:15px var(--mono,monospace); }
+:global(.catalog-product h2) { margin:auto 0 8px; font-size:14px; line-height:1.45; }
+:global(.catalog-product p) { margin:0; min-height:32px; color:var(--muted,#777); font-size:10px; line-height:1.6; }
+:global(.catalog-product-bottom) { display:flex; justify-content:space-between; align-items:end; gap:8px; margin-top:15px; padding-top:12px; border-top:1px solid var(--line,#d4d4ce); }
+:global(.catalog-product-bottom strong) { font-size:16px; white-space:nowrap; }
+:global(.catalog-product-bottom span) { color:var(--muted,#777); font:7px/1.5 var(--mono,monospace); text-align:right; }
+:global(.catalog-empty) { margin-top:40px; padding:28px; border:1px solid var(--line,#d4d4ce); color:var(--muted,#777); font:10px/1.8 var(--mono,monospace); }
+@media(max-width:760px) { :global(.catalog-product) { min-height:235px; padding:12px; } }
+@media(max-width:380px) { :global(.catalog-product) { min-height:210px; } }
+
 </style>
 <script>
 const page = document.querySelector(".category-page");
