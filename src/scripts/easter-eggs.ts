@@ -24,7 +24,7 @@ if(footerBottom){
     let stage=0;
     const puzzles=[
       {title:"01 // THE REVERSAL",body:"I have no face, yet I return every face. I reverse without moving. Name what stands before you.",answer:"MIRROR",hint:"Every letter has an opposite at the far end of the alphabet."},
-      {title:"02 // THE DISPLACEMENT",body:"GUR XRL VF GUV EEG RRA. The alphabet did not change its order; it only changed its starting point. What number is the key?",answer:"THIRTEEN",hint:"The alphabet has 26 letters. The shift divides it into two equal halves."},
+      {title:"02 // THE DISPLACEMENT",body:"GUR XRL VF GUV EGRRA. The alphabet did not change its order; it only changed its starting point. What number is the key?",answer:"THIRTEEN",hint:"The alphabet has 26 letters. The shift divides it into two equal halves."},
       {title:"03 // THE ABSENCE",body:"... .. .-.. . -. -.-. .\n\nThe final message is not a sound. Read the spaces as carefully as the marks.",answer:"SILENCE",hint:"International Morse. One character at a time."}
     ];
     const render=()=>{
