@@ -17,6 +17,45 @@ if(footerBottom){
   key.className="pos-key";
   key.textContent="ARCHIVE KEY // README / ROT INDEX";
   key.setAttribute("aria-label","Archive key index is documented in the POSPOLITE README");
+  key.setAttribute("role","button");
+  key.tabIndex=0;
+  let archiveTaps=0,archiveTapTimer=0;
+  const openBlackFile=()=>{
+    let stage=0;
+    const puzzles=[
+      {title:"01 // THE REVERSAL",body:"I have no face, yet I return every face. I reverse without moving. Name what stands before you.",answer:"MIRROR",hint:"Every letter has an opposite at the far end of the alphabet."},
+      {title:"02 // THE DISPLACEMENT",body:"GUR XRL VF GUV EEG RRA. The alphabet did not change its order; it only changed its starting point. What number is the key?",answer:"THIRTEEN",hint:"The alphabet has 26 letters. The shift divides it into two equal halves."},
+      {title:"03 // THE ABSENCE",body:"... .. .-.. . -. -.-. .\n\nThe final message is not a sound. Read the spaces as carefully as the marks.",answer:"SILENCE",hint:"International Morse. One character at a time."}
+    ];
+    const render=()=>{
+      const p=puzzles[stage];
+      const w=modal('<div>RESTRICTED // BLACK FILE 00</div><div class="pos-signal-meta">LAYER '+String(stage+1).padStart(2,"0")+' / 03 · NO HINTS INCLUDED</div><h2>'+p.title+'</h2><p style="white-space:pre-line">'+p.body+'</p><input id="black-answer" autocomplete="off" spellcheck="false" placeholder="ENTER DECRYPTED ANSWER"><p id="black-feedback" aria-live="polite"></p><button id="black-submit">VERIFY</button><button data-close>ABORT</button>');
+      const input=w.querySelector<HTMLInputElement>("#black-answer")!;
+      const feedback=w.querySelector<HTMLElement>("#black-feedback")!;
+      const submit=()=>{
+        const value=input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
+        if(value===p.answer){
+          stage++;
+          if(stage===puzzles.length){
+            w.remove();
+            modal('<div>BLACK FILE // ACCESS GRANTED</div><h2>YOU FOUND THE QUIET.</h2><p>Three layers. Three keys. One conclusion: SILENCE.</p><p>There is no 26th fragment. The archive has no record of this event.</p><button data-close>LEAVE NO TRACE</button>');
+          }else render();
+        }else feedback.textContent="ACCESS DENIED. "+p.hint;
+      };
+      w.querySelector("#black-submit")?.addEventListener("click",submit);
+      input.addEventListener("keydown",e=>{if(e.key==="Enter")submit()});
+      input.focus();
+    };
+    render();
+  };
+  const tapArchiveKey=()=>{
+    archiveTaps++;
+    window.clearTimeout(archiveTapTimer);
+    archiveTapTimer=window.setTimeout(()=>archiveTaps=0,2200);
+    if(archiveTaps>=5){archiveTaps=0;openBlackFile()}
+  };
+  key.addEventListener("click",tapArchiveKey);
+  key.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();tapArchiveKey()}});
   footerBottom.append(key);
   const signal=document.createElement("button");
   signal.className="pos-signal";
